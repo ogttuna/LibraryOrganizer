@@ -39,7 +39,24 @@ else:
     raise SystemExit('Native Folio SQLite initialization did not complete.')
 PY
 folio_window="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["windowId"])' "$folio_output/native-window.json")"
-# Screenshot support depends on the runner's window-server permission. Record failure without faking an image.
-if ! screencapture -x -l "$folio_window" "$folio_output/native-window.png"; then
-  echo 'Runner screenshot permission unavailable; native-window.json contains the observed window bounds.' > "$folio_output/screenshot-unavailable.txt"
-fi
+# A window can appear before React's first paint. Observe client content for at most 15 seconds.
+folio_capture_started=$SECONDS
+while true; do
+  kill -0 "$folio_pid"
+  if screencapture -x -l "$folio_window" "$folio_output/native-window.png" &&
+    "$RUNNER_TEMP/folio-window-smoke" --check-content "$folio_output/native-window.png"; then
+    break
+  fi
+  if (( SECONDS - folio_capture_started >= 15 )); then
+    echo 'Folio window remained blank or could not be captured for 15 seconds.' >&2
+    exit 1
+  fi
+  sleep 1
+done
+python3 - "$folio_output/native-window.json" <<'PY'
+import json, pathlib, sys
+path = pathlib.Path(sys.argv[1])
+report = json.loads(path.read_text())
+report['clientContentPainted'] = True
+path.write_text(json.dumps(report, indent=2) + '\n')
+PY

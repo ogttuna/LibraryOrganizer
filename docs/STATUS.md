@@ -14,6 +14,8 @@ Gerçek optimize Linux/WebKit testinde 11 akış geçti: eski genişliğe sığd
 
 Kanıt: `output/reader-fit-smoke/report.json`; tekrar: `scripts/smoke-reader-fit.py`. Bu sürüm veritabanı şemasını değiştirmez.
 
+Linux 0.2.1 paketi: `output/release/linux-x64/Folio_0.2.1_amd64.deb`; SHA-256 `d73e0fd0b4ffabc7376f66e50feabe41214891d4d30552fcf5bea76ade15d288`.
+
 ## 0.2.0 temel sürümünün doğrulama kaydı
 
 ## Tamamlanan kapsam
