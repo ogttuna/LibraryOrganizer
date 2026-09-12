@@ -16,26 +16,32 @@ Uygulama verisi bilgisayarda kalır. GitHub deposu yalnızca kaynak kod ve iste�
 
 Yerel ortam: Ubuntu 24.04.4, Node 24.21.0, Rust 1.95.0, GTK 3.24.41, WebKitGTK 2.52.6.
 
-| Kontrol                              | Sonuç                                                                                                                                     |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Rust çekirdek                        | 30 test geçti; ignored olan ek test yalnızca süreç testi tarafından çağrılan alt süreç işçisidir                                          |
-| React / TypeScript davranış testleri | 43 test geçti                                                                                                                             |
-| TypeScript/Vite üretim derlemesi     | Geçti                                                                                                                                     |
-| Masaüstü dahil Clippy                | Geçti                                                                                                                                     |
-| Linux gerçek Tauri/WebKit            | IPC, SQLite, import/mükerrerlik, Türkçe FTS, not otomatik kayıt, PDF sayfaları ve yeniden açılış geçti                                    |
-| Sınıflandırma arayüzü                | Global etiket yeniden adlandırma/silme, kategori taşıma/silme, alt kategoriyi koruma, filtre ve yerinde oluşturma geçti                   |
-| Uzun metin                           | 220 satır Türkçe/Japonca/Arapça/emoji not, ayrı açıklama/özet/yıl, hızlı kayıt değiştirme ve sayfa yenileme geçti                         |
-| Kapanış yarışları                    | Yeni taslaklar, hızlı sayfa değişimi, eşzamanlı Quit, yazma hatası/tekrar ve açık işlemleri bekleme testleri geçti                        |
-| Gerçek kesinti                       | 100 dosyanın ortasında child süreç öldürüldü; 49 tamamlanan dosya hash'i korundu, toparlama ve 100'e tamamlama geçti                      |
-| Hatalı dosya erişimi                 | Kopya sırasında kaynak değişimi ve izin reddi; sonra tekrar ekleme geçti                                                                  |
-| JPEG2000 PDF                         | Gerçek JPX görüntüsü native WebKit'te üretim CSP ile çizildi; ilk sayfa 1,01 sn                                                           |
-| Sentetik 200 MiB PDF                 | İlk sayfa 25,09 → 0,86 sn; iki range isteğiyle 266.517 bayt okundu. Büyük kullanılmayan akış içerir; gerçek taranmış kitap testi değildir |
-| 10.000 kayıt                         | Gerçek SQL/FTS sorguları ve IPC JSON ölçüldü; [performans raporu](PERFORMANCE.md)                                                         |
-| macOS dağıtım tanımı                 | M1/Intel/universal hedefleri, imza doğrulama, DMG ve SHA-256 üretimi; Actions ve shell kontrolleri geçti                                  |
+| Kontrol                              | Sonuç                                                                                                                                                                |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rust çekirdek                        | 30 test geçti; ignored olan ek test yalnızca süreç testi tarafından çağrılan alt süreç işçisidir                                                                     |
+| React / TypeScript davranış testleri | 43 test geçti                                                                                                                                                        |
+| TypeScript/Vite üretim derlemesi     | Geçti                                                                                                                                                                |
+| Masaüstü dahil Clippy                | Geçti                                                                                                                                                                |
+| Linux gerçek Tauri/WebKit            | Optimize release ikilisinde IPC, SQLite, import/mükerrerlik, Türkçe FTS, not, PDF, yedek doğrulama/iptal ve yeniden açılış geçti                                     |
+| Sınıflandırma arayüzü                | Global etiket yeniden adlandırma/silme, kategori taşıma/silme, alt kategoriyi koruma, filtre ve yerinde oluşturma geçti                                              |
+| Uzun metin                           | 220 satır Türkçe/Japonca/Arapça/emoji not, ayrı açıklama/özet/yıl, hızlı kayıt değiştirme ve sayfa yenileme geçti                                                    |
+| Kapanış yarışları                    | Birim testleri ve native Quit geçti; son tuş + Quit aynı JS işinde gönderildi, SQLite kaydı ve gerçek pencere kapanışı doğrulandı                                    |
+| Gerçek kesinti                       | 100 dosyanın ortasında child süreç öldürüldü; 49 tamamlanan dosya hash'i korundu, toparlama ve 100'e tamamlama geçti                                                 |
+| Hatalı dosya erişimi                 | Kopya sırasında kaynak değişimi ve izin reddi; sonra tekrar ekleme geçti                                                                                             |
+| JPEG2000 PDF                         | Gerçek JPX görüntüsü native WebKit'te üretim CSP ile çizildi; fetch değiştirilmeden son kontrol 0,33 sn                                                              |
+| Sentetik 200 MiB PDF                 | Son temiz kontrol ilk sayfa 0,65 sn (önceden 25,09 sn). Ayrı range ölçümünde 266.517 bayt okundu. Sentetik kullanılmayan akış; gerçek taranmış kitap ölçümü değildir |
+| 10.000 kayıt                         | Gerçek SQL/FTS sorguları ve IPC JSON ölçüldü; [performans raporu](PERFORMANCE.md)                                                                                    |
+| macOS dağıtım tanımı                 | M1/Intel/universal hedefleri, imza doğrulama, DMG ve SHA-256 üretimi; Actions ve shell kontrolleri geçti                                                             |
 
-Mac derlemesi ve gerçek Mac açılışının sonucu, ilgili GitHub Actions çalışması tamamlanınca bu dosyaya eklenir. Yalnızca workflow tanımı bu kontrolün geçtiği anlamına gelmez.
+Mac Apple Silicon: [Actions çalışması](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34697742088) kaynak `78c975aa23bd5181f562ebc49d7be3773e1d3c70` üzerinden ARM64 release uygulama ve DMG üretti. Native pencere, boş SQLite başlatma/migration/integrity, codesign ve DMG kontrolleri geçti. Kullanıcının fiziksel M1 cihazındaki PDF/EPUB ve günlük kullanım kabulü ayrıca bekliyor.
 
 Native Linux etkileşim testleri ölçekli Wayland oturumundaki WebDriver pointer sınırlaması nedeniyle DOM click/input olayları gönderir. Dosya erişimi, SQLite, IPC, asset protokolü ve PDF render gerçektir. İşletim sistemi dosya seçici/sürükle bırak tıklamalarının kabulü sayılmaz. Testler ayrı veri dizininde yapılır.
+
+Mac paketi: `Folio_0.2.0_aarch64.dmg`, 8.370.211 bayt, minimum macOS 15.0. Derleme ortamı macOS 15.7.9 / arm64; SHA-256 `d4dd2707c65b03d78def30d1b67809ead529968e82e0d86f7e95f6595643175f`. Pencere, CI ekranına 1024×681 olarak sığdı; gerçek Folio arayüzü görüntüsü incelendi. Yerel teslim: `output/release/macos-m1/`; Linux: `output/release/linux-x64/`.
+
+Linux optimize DEB: `Folio_0.2.0_amd64.deb`, SHA-256 `b46a0331b343dc0662696c2aa2dd9396707f54c5b9f2f65b968341941446086d`.
+
+Native PDF kabulü tek aktif test penceresinde çalıştırıldı. Aynı uygulamanın farklı sürücülerle eşzamanlı açıldığı testlerde render beklemesi görüldü; izole tekrarlar geçti. Nedeni kesinleştirilmedi; bu denemeler başarılı performans sonucu sayılmaz.
 
 ## Açık sınırlar
 

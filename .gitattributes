@@ -1,0 +1,5 @@
+# SQLx hashes migration source bytes: keep them identical across OS checkouts.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.icns binary

@@ -22,6 +22,8 @@ TanStack Query sorgu ve mutation ayarlarında `networkMode: always` kullanır. Z
 
 SQLite WAL, foreign keys, busy timeout ve paketlenmiş migration kullanır. Yazma servisleri kategori/etiket güncellemeleri ile arama indeksini aynı transaction içinde değiştirir. Liste sorguları sınırlandırılmış sayfalarla çalışır. Kullanıcı metni SQL veya ham FTS dili olarak birleştirilmez. Sıralama alanları enum/izinli listedir.
 
+`.gitattributes` metinleri Windows dahil LF satır sonuyla checkout eder. SQLx migration hash'leri kaynak baytlarına bağlı olduğundan işletim sistemi değişince CRLF farkıyla taşınabilir yedeğin reddedilmesi önlenir.
+
 ## Depolama ve içe aktarma
 
 Kök: Tauri `app_local_data_dir()/library`. Veritabanı: `library.sqlite`. Ekler: `files/<attachment-uuid>/original.<extension>`. Geçici alan: `.staging/<job-uuid>`. Veritabanına yalnızca göreli yollar yazılır; özgün dosya adı ayrı tutulur.

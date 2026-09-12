@@ -18,7 +18,7 @@
 
 ## Dağıtım kabulü
 
-- [ ] M1 DMG iş akışının başarıyla tamamlanması ve indirilebilir paketin teslimi. Gerçek durum `STATUS.md` içinde güncellenir.
+- [x] M1 DMG üretimi, imza/mimari/pencere/SQLite doğrulaması ve indirilebilir paket. Derleme ve hash `STATUS.md` içinde.
 - [ ] Kullanıcının M1/macOS15+ üzerinde kurulum, dosya seçici/sürükle bırak ve gerçek belgelerle günlük kullanım kabulü.
 - [ ] Windows11 ve Intel Mac gerçek cihaz kabulü.
 - [ ] Developer ID/notarization kimlik bilgileri sağlandığında tam imzalı dağıtım.

@@ -28,9 +28,11 @@ Başka terminalde:
 
 ```sh
 python3 scripts/smoke-desktop.py
+# Optimize release paketiyle aynı ikiliyi doğrulamak için:
+python3 scripts/smoke-desktop.py --application src-tauri/target/release/folio
 ```
 
-Script `get_library_path` sonucunun proje içindeki `output/native-smoke` altında olduğunu doğrulamadan veri değiştirmez. Kendi iki sayfalık PDF'sini oluşturur, gerçek IPC üzerinden ekler, WebKit'te not yazar, PDF render eder, konumu ve yedeği doğrular, uygulamayı yeniden açar. Yedeği geçici alanda doğrulatıp geri yüklemeyi iptal eder; son not karakterlerinden hemen sonra native Quit köprüsünü çağırır ve kapanışta SQLite kaydını doğrular.
+Script `get_library_path` sonucunun proje içindeki `output/native-smoke` altında olduğunu doğrulamadan veri değiştirmez. Kendi iki sayfalık PDF'sini oluşturur, gerçek IPC üzerinden ekler, WebKit'te not yazar, PDF render eder, konumu ve yedeği doğrular, uygulamayı yeniden açar. Yedeği geçici alanda doğrulatıp geri yüklemeyi iptal eder; son not karakterlerinden hemen sonra native Quit köprüsünü çağırır ve kapanışta SQLite kaydını ve gerçek pencere/oturum kapanışını, test temizliği çalışmadan doğrular. Son tuş ile Quit tek JS işinde gönderilir; debounce araya giremez. Native GUI testlerini aynı anda iki farklı sürücüyle çalıştırma; PDF çizimi için tek görünür test penceresi kullan.
 
 Bu ortamın ölçekli Wayland oturumunda WebKitWebDriver pointer/clear işlemleri güvenilir davranmadığından script native WebView içinde DOM click/input olayları kullanır. SQLite, IPC, dosya erişimi, asset protokolü ve PDF render gerçektir. Bu test, işletim sistemi dosya seçici/sürükle bırak etkileşiminin manuel kabul testinin yerine geçmez.
 
