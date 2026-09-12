@@ -70,7 +70,7 @@ Testleri ayrı bir macOS kullanıcı hesabında veya boş test kütüphanesinde 
 
 | Akış                                                               | Beklenen sonuç                                             | Apple Silicon | Intel    |
 | ------------------------------------------------------------------ | ---------------------------------------------------------- | ------------- | -------- |
-| DMG → Applications → ilk açılış                                    | Boş kütüphane; kurulum/izin hatası yok                     | Bekliyor      | Bekliyor |
+| DMG → Applications → ilk açılış                                    | Boş kütüphane; kurulum/izin hatası yok                     | Açıldı¹       | Bekliyor |
 | Finder'dan PDF + EPUB sürükle; dosya seçiciyi ayrıca kullan        | Dosyalar arşive kopyalanır, özgün dosya korunur            | Bekliyor      | Bekliyor |
 | Boşluk/Türkçe içeren ad; farklı adla aynı dosya                    | Kayıp yol yok, mükerrer dosya çoğalmaz                     | Bekliyor      | Bekliyor |
 | Üç kategori, alt kategori, çoklu etiket; bir üyeliği kaldır        | Diğer üyelikler ve dosyalar korunur                        | Bekliyor      | Bekliyor |
@@ -84,5 +84,7 @@ Testleri ayrı bir macOS kullanıcı hesabında veya boş test kütüphanesinde 
 | 100 dosya ekleme, ardından yedek; aktarım sırasında kapatmayı dene | Kopyalar tutarlı; bekleyen işlem varken kapatma engellenir | Bekliyor      | Bekliyor |
 | Çöp/geri al; yedekten geri yükle; bozuk yedeği reddet              | Notlar/ilişkiler/hash'ler korunur                          | Bekliyor      | Bekliyor |
 | Wi-Fi kapalı, yeniden aç ve düzenle                                | Kütüphane, PDF, arama ve otomatik kayıt çalışır            | Bekliyor      | Bekliyor |
+
+¹ Kullanıcı macOS 15.6.1 / M1 (2020) üzerinde, imza kontrolü ve yalnızca Folio'nun karantina işareti kaldırıldıktan sonra uygulamanın açıldığını bildirdi. İlk kurulumda açılış engeli yaşandı; ayrıntı `STATUS.md` içinde. Geri yükleme ve PDF kabulü henüz bildirilmedi.
 
 Mac paketi GitHub'ın macOS runner'ında üretilebilir; kullanıcının Mac'ine kaynak kod veya geliştirme araçları kurulması gerekmez. Build sonucu ve indirilecek paket `STATUS.md` içinde kaydedilir.
