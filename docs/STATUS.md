@@ -4,13 +4,13 @@
 
 ## 0.2.2 — Kategori ve etiket gezinmesi
 
-Sol panelde kategori ve etiket listeleri ayrı sekmelere alındı. Seçili liste kalan yüksekliği kullanır; arama alanı ve alt işlemler kaydırmadan bağımsız kalır. Uzun adlar satıra yayılır. Kategori düzenleme ve alt kategori ekleme tek bir işlem menüsünde toplanır. Sekmeler arasında geçiş mevcut filtreleri ve iki ayrı arama metnini korur; ok tuşları, Home ve End desteklenir.
+Sol panelde kategori ve etiket listeleri ayrı sekmelere alındı. Seçili liste kalan yüksekliği kullanır; arama alanı ve alt işlemler kaydırmadan bağımsız kalır. Uzun adlar satıra yayılır. Kategori düzenleme ve alt kategori ekleme tek bir işlem menüsünde toplanır. Sekmeler arasında geçiş mevcut filtreleri ve iki ayrı arama metnini korur; ok tuşları, Home ve End desteklenir. Dar pencerede kapalı gezinme paneli klavye odağı almaz.
 
-66 React/TypeScript testi, üretim derlemesi ve biçim kontrolü geçti. Dokuz yeni test; 29 kategori / 229 etiket, Türkçe arama, çoklu filtreleri koruma, kategori ağacı, işlem menüsü, boş kütüphane ve klavye akışlarını kapsar. Tarayıcıda 1440×900, 1100×700 ve 1000×600 boyutları incelendi; uzun etiket ve işlem menüsünden düzenleme diyaloğuna odak geçişi doğrulandı.
+66 React/TypeScript testi, üretim derlemesi ve biçim kontrolü geçti. Dokuz yeni test; 29 kategori / 229 etiket, Türkçe arama, çoklu filtreleri koruma, kategori ağacı, işlem menüsü, boş kütüphane ve klavye akışlarını kapsar. Tarayıcıda 1440×900, 1100×700, 1000×600 ve 820×600 boyutları incelendi; uzun etiket ve işlem menüsünden düzenleme diyaloğuna odak geçişi doğrulandı.
 
 Gerçek Linux/WebKit release uygulamasında 1116×744 ve 1007×697 CSS piksel alanlarda tek liste, sabit arama/alt işlemler, uzun etiket araması, düzenleme odağı ve kategori filtresi doğrulandı. Ölçekli Wayland ortamında DOM tıklamaları kullanıldı; native SQLite ve IPC gerçektir. Kanıt: `output/sidebar-iteration/native-report.json`, `output/playwright/sidebar-*.png`. Veritabanı şeması değişmedi.
 
-Linux paketi: `output/release/linux-x64/Folio_0.2.2_amd64.deb`; SHA-256 `6adc3b0ccff47cc4a7e6680d43ee83bf013c410991b71a1c031279d4d2c1067d`. Bu yerel kontroller macOS veya Windows etkileşim kabulü değildir.
+Linux paketi: `output/release/linux-x64/Folio_0.2.2_amd64.deb`; SHA-256 `019d7e9f54e20bfc096c1da3072791d33a05b95f333ffe80975ff961a6a625a6`. Bu yerel kontroller macOS veya Windows etkileşim kabulü değildir.
 
 ## 0.2.1 — PDF sığdırma ve not düzenleme
 
