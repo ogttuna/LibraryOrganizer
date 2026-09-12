@@ -1,0 +1,305 @@
+.taxonomy-help,
+.taxonomy-empty {
+  color: #666e65;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+.taxonomy-empty {
+  padding: 28px 12px;
+  text-align: center;
+}
+.taxonomy-delete-confirm {
+  border: 1px solid #e9d3c9;
+  background: #fff8f3;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.taxonomy-delete-confirm strong {
+  display: block;
+  font-weight: 600;
+  color: #6e362b;
+}
+.taxonomy-delete-confirm p {
+  margin: 8px 0 0;
+  color: #735b51;
+}
+.taxonomy-delete-confirm .dialog-actions {
+  margin-top: 16px;
+}
+.taxonomy-action-spacer {
+  flex: 1;
+}
+.taxonomy-danger {
+  color: #a04438;
+}
+.taxonomy-dialog-actions {
+  flex-wrap: wrap;
+}
+.taxonomy-manager-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.taxonomy-manager-toolbar .picker-search {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding-left: 9px;
+}
+.taxonomy-manager-toolbar input {
+  min-width: 0;
+  width: 100%;
+  padding: 8px;
+}
+.taxonomy-manager-list {
+  max-height: min(50vh, 420px);
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+}
+.taxonomy-manager-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--border);
+  color: #687365;
+}
+.taxonomy-manager-row > div {
+  flex: 1;
+  min-width: 0;
+}
+.taxonomy-manager-row strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.taxonomy-manager-row small {
+  display: block;
+  font-size: 11px;
+  margin-top: 3px;
+}
+.taxonomy-manager-row .button {
+  flex-shrink: 0;
+}
+.taxonomy-manager-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  font-size: 12px;
+  color: #666e65;
+}
+.taxonomy-chip-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.taxonomy .category-chip,
+.taxonomy .tag-chip {
+  max-width: 100%;
+}
+.taxonomy .category-chip > svg,
+.taxonomy .category-chip > button,
+.taxonomy .tag-chip > button {
+  flex-shrink: 0;
+}
+.taxonomy-picker-caption {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: #727f68;
+}
+.taxonomy-navigation-scroll {
+  overflow-y: auto;
+  min-height: 70px;
+  flex: 1;
+  margin-top: 20px;
+}
+.taxonomy-navigation-scroll .sidebar-section-heading {
+  margin-top: 0;
+  padding-bottom: 8px;
+}
+.taxonomy-navigation-scroll .taxonomy-tags-heading {
+  margin-top: 20px;
+}
+.taxonomy-navigation-scroll .category-navigation {
+  overflow: visible;
+  min-height: 0;
+}
+.taxonomy-navigation-scroll .category-link {
+  gap: 6px;
+}
+.taxonomy-navigation-scroll .category-link svg {
+  flex-shrink: 0;
+}
+.taxonomy-tree-toggle {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #67725e;
+}
+.taxonomy-tree-spacer {
+  flex: 0 0 16px;
+}
+.taxonomy-section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 4px 0;
+  background: transparent;
+  font-size: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+.taxonomy-section-toggle > span {
+  font-size: 10px;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+.taxonomy-nav-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 7px 8px;
+  padding: 0 7px;
+  background: #ffffff70;
+  border: 1px solid #dce2d5;
+  border-radius: 5px;
+  color: #77816d;
+}
+.taxonomy-nav-search input {
+  min-width: 0;
+  width: 100%;
+  padding: 6px 0;
+  font-size: 12px;
+  background: transparent;
+  border: 0;
+}
+.taxonomy-nav-empty {
+  padding: 5px 12px;
+  font-size: 12px;
+  color: #6d7768;
+  line-height: 1.5;
+}
+.taxonomy-tag-navigation {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.taxonomy-tag-navigation .nav-link {
+  padding: 7px 12px;
+  min-height: 32px;
+  font-size: 12px;
+  gap: 8px;
+}
+.taxonomy-tag-navigation .nav-link > span:not(.nav-count) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.taxonomy-tag-navigation .nav-link svg {
+  flex-shrink: 0;
+}
+.taxonomy-filter-search {
+  margin: 8px 0 0;
+  padding: 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+.taxonomy-filter-search input {
+  min-width: 0;
+  width: 100%;
+}
+.filters-popover {
+  max-height: calc(100dvh - 110px);
+  overflow-y: auto;
+}
+.taxonomy-filter-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+.taxonomy-filter-group-heading .field-label {
+  margin: 0;
+}
+.taxonomy-filter-group-heading button {
+  font-size: 11px;
+  padding: 2px 5px;
+  height: auto;
+}
+.taxonomy-active-clear {
+  border: 0;
+  background: transparent;
+  color: #5e6b58;
+  font-size: 11px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (hover: none) {
+  .taxonomy-navigation-scroll .category-edit {
+    opacity: 1;
+  }
+}
+@media (max-height: 700px) {
+  .taxonomy-navigation-scroll {
+    margin-top: 10px;
+  }
+  .sidebar .sidebar-bottom {
+    padding-top: 10px;
+  }
+}
+.taxonomy-filter-mode {
+  color: #687364;
+  font-size: 11px;
+  padding: 3px;
+}
+.active-filters .filter-chip {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.active-filters .filter-chip svg {
+  flex-shrink: 0;
+}
+.sidebar .taxonomy-navigation-scroll {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 100px;
+}
+.taxonomy-navigation-scroll > .sidebar-section-heading {
+  flex-shrink: 0;
+}
+.taxonomy-navigation-scroll > .category-navigation {
+  min-height: 34px;
+  flex: 1 1 120px;
+  overflow-y: auto;
+}
+.taxonomy-navigation-scroll > .taxonomy-tags-heading {
+  margin-top: 12px;
+}
+.taxonomy-navigation-scroll > .taxonomy-nav-search {
+  flex-shrink: 0;
+}
+.taxonomy-navigation-scroll > .taxonomy-tag-navigation {
+  min-height: 34px;
+  flex: 1 1 110px;
+  overflow-y: auto;
+}

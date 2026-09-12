@@ -1,0 +1,79 @@
+name: Folio macOS DMG
+
+# Runs only when requested. Produces downloadable artifacts, never a public release.
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: 'M1/M2/M3/M4: apple-silicon; Intel veya ikisi isteğe bağlı'
+        required: true
+        default: apple-silicon
+        type: choice
+        options:
+          - apple-silicon
+          - intel
+          - both
+      signing:
+        description: 'adhoc: kişisel deneme; signed: Developer ID + notarization'
+        required: true
+        default: adhoc
+        type: choice
+        options:
+          - adhoc
+          - signed
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-package-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  macos:
+    name: macOS ${{ matrix.arch }} / ${{ inputs.signing }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.architecture == 'both' && '[{"os":"macos-15","arch":"apple-silicon","target":"aarch64-apple-darwin"},{"os":"macos-15-intel","arch":"intel","target":"x86_64-apple-darwin"}]' || inputs.architecture == 'intel' && '[{"os":"macos-15-intel","arch":"intel","target":"x86_64-apple-darwin"}]' || '[{"os":"macos-15","arch":"apple-silicon","target":"aarch64-apple-darwin"}]') }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: macos-${{ matrix.target }}
+      - run: npm ci
+      - name: Ad-hoc DMG build and package verification
+        if: inputs.signing == 'adhoc'
+        run: bash scripts/macos-build.sh "${{ matrix.target }}" adhoc
+      - name: Signed and notarized DMG build and package verification
+        if: inputs.signing == 'signed'
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: bash scripts/macos-sign-and-build.sh "${{ matrix.target }}"
+      - name: Launch native app and verify window and SQLite initialization
+        run: bash scripts/macos-smoke.sh "${{ matrix.target }}"
+      - name: Store installer, checksum and verification report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Folio-macos-${{ matrix.arch }}-${{ inputs.signing }}-${{ github.sha }}
+          path: output/macos/${{ matrix.target }}/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Acceptance status
+        run: |
+          echo 'DMG, architecture and code signature checks passed. GUI acceptance is still required on target hardware; see docs/MACOS.md.' >> "$GITHUB_STEP_SUMMARY"

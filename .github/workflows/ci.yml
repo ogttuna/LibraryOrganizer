@@ -1,0 +1,97 @@
+name: Folio desktop checks
+
+# Optional development workflow. No deployment, runtime service or user-data upload.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm run format:check
+      - run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --no-default-features --locked
+      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --no-default-features --all-targets --locked -- -D warnings
+
+  desktop:
+    needs: checks
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            bundle: deb
+          - os: windows-2025
+            target: x86_64-pc-windows-msvc
+            bundle: nsis
+          - os: macos-15
+            target: aarch64-apple-darwin
+            bundle: dmg
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+            bundle: dmg
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: ${{ matrix.target }}
+      - name: Linux system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - run: npm ci
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --no-default-features --locked
+      - name: Build Linux or Windows installer
+        if: runner.os != 'macOS'
+        run: npm run tauri -- build --ci --target ${{ matrix.target }} --bundles ${{ matrix.bundle }} -- --locked
+      - name: Build and inspect macOS installer
+        if: runner.os == 'macOS'
+        run: bash scripts/macos-build.sh "${{ matrix.target }}" adhoc
+      - name: Store macOS installer and report
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Folio-${{ matrix.target }}-${{ github.sha }}
+          path: output/macos/${{ matrix.target }}/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Store Linux or Windows installer
+        if: runner.os != 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Folio-${{ matrix.target }}-${{ github.sha }}
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe
+          if-no-files-found: error
+          retention-days: 14
