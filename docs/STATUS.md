@@ -12,6 +12,10 @@ Gerçek Linux/WebKit release uygulamasında 1116×744 ve 1007×697 CSS piksel al
 
 Linux paketi: `output/release/linux-x64/Folio_0.2.2_amd64.deb`; SHA-256 `019d7e9f54e20bfc096c1da3072791d33a05b95f333ffe80975ff961a6a625a6`. Bu yerel kontroller macOS veya Windows etkileşim kabulü değildir.
 
+Mac 0.2.2: [başarılı Actions çalışması](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34702784137), kaynak `002015402640d6bbab1b4a2cd0dc6468b4ddec23`. macOS 15.7.9 / ARM64 ortamında 66 TypeScript + 30 Rust = 96 test geçti. ARM64 mimarisi, ad-hoc imza, DMG bütünlüğü, boş SQLite başlatma/migration/integrity ve boyanmış native pencere doğrulandı. Ekran görüntüsünde yeni kategori/etiket sekmeleri ve alt işlemler incelendi; ana liste o anda yüklenme durumundaydı. Bu kontrol Mac üzerinde tamamlanmış liste/PDF etkileşim kabulü değildir.
+
+M1 paketi: `output/release/macos-m1-0.2.2/Folio_0.2.2_aarch64.dmg`, 8.374.291 bayt; SHA-256 `1326b93f6436b1c82a334f4565c0fb0faa45b6086f03ac9b36091e56816899d9`. Minimum macOS 15.0; Developer ID/notarization uygulanmadı. Derleme raporu, native pencere görüntüsü ve CI günlüğü aynı yerel çıktı klasöründedir.
+
 ## 0.2.1 — PDF sığdırma ve not düzenleme
 
 Radix portalı henüz PDF alanını oluşturmadan çalışan tek seferlik ölçüm kaldırıldı. Okuyucu gerçek alanın genişlik/yüksekliğini ve CSS iç boşluklarını ölçer; Sayfaya sığdır, Genişliğe sığdır ve yüzde seçimi sunar. Yakınlaştırma mevcut fit ölçeğinden başlar; not paneli ve pencere değişince yeniden hesaplanır. Sayfa değişiminde kaydırma sıfırlanır. Hatalı render sonrasında sayfa değiştirme, geciken sayfa yanıtı ve parola/tekrar deneme durumları düzeltildi.
