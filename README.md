@@ -8,7 +8,7 @@ Tauri 2 · React/TypeScript · Rust/SQLx · SQLite/FTS5 · PDF.js
 
 ## MacBook M1'e kurulum
 
-Mac üzerinde Node.js, Rust veya geliştirme ortamı gerekmez. [Doğrulanmış M1 derlemesinden](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34697742088) **apple-silicon** paketini indir. ZIP'i aç, içindeki DMG'yi açıp Folio'yu **Uygulamalar** klasörüne sürükle.
+Mac üzerinde Node.js, Rust veya geliştirme ortamı gerekmez. [Doğrulanmış M1 derlemesinden](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34699171366) **apple-silicon** paketini indir. ZIP'i aç, içindeki DMG'yi açıp Folio'yu **Uygulamalar** klasörüne sürükle.
 
 Hedef **macOS 15 ve üzeri**. Kişisel kullanım paketi ad-hoc imzalıdır. macOS ilk açılışta geliştiriciyi doğrulayamadığını bildirirse, açma denemesinden sonra **Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç** yolunu kullan. Pakette `KURULUM.txt`, SHA-256 ve derleme/doğrulama raporu bulunur. [Mac paketleme ve kabul durumu](docs/MACOS.md).
 

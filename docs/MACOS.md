@@ -1,10 +1,10 @@
 # macOS: derleme, kurulum ve gerçek cihaz kabulü
 
-Folio için hedef **macOS 15 ve üzeri**, Apple Silicon ve Intel. 0.2.0 Apple Silicon `.app` ve DMG, [GitHub macOS çalışmasında](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34697742088) üretildi. ARM64 mimari, ad-hoc imza, DMG bütünlüğü, gerçek pencere açılışı ve SQLite başlatma kontrolleri geçti. Intel hedefi yapılandırılmıştır; bu sürümün Intel donanım kabulü yapılmadı.
+Folio için hedef **macOS 15 ve üzeri**, Apple Silicon ve Intel. 0.2.1 Apple Silicon `.app` ve DMG, [GitHub macOS çalışmasında](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34699171366) üretildi. ARM64 mimari, ad-hoc imza, DMG bütünlüğü, gerçek pencere açılışı ve SQLite başlatma kontrolleri geçti. Intel hedefi yapılandırılmıştır; bu sürümün Intel donanım kabulü yapılmadı.
 
 ## MacBook M1 üzerinde kurulum
 
-[Başarılı derlemenin](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34697742088) Artifacts bölümündeki Apple Silicon paketini indir; ZIP içindeki DMG paketini Mac'e kopyala, aç ve Folio'yu Applications / Uygulamalar klasörüne sürükle. Son kullanıcı bilgisayarında Node, Rust, Xcode veya geliştirme ortamı gerekmez. macOS 15 veya üzeri gerekir. Ad-hoc imza için ilk açılışta macOS onay isterse Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç yolunu kullan.
+[Başarılı derlemenin](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34699171366) Artifacts bölümündeki Apple Silicon paketini indir; ZIP içindeki DMG paketini Mac'e kopyala, aç ve Folio'yu Applications / Uygulamalar klasörüne sürükle. Son kullanıcı bilgisayarında Node, Rust, Xcode veya geliştirme ortamı gerekmez. macOS 15 veya üzeri gerekir. Ad-hoc imza için ilk açılışta macOS onay isterse Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç yolunu kullan.
 
 ## Geliştirici için yerel derleme
 

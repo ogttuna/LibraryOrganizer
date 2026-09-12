@@ -16,6 +16,10 @@ Kanıt: `output/reader-fit-smoke/report.json`; tekrar: `scripts/smoke-reader-fit
 
 Linux 0.2.1 paketi: `output/release/linux-x64/Folio_0.2.1_amd64.deb`; SHA-256 `d73e0fd0b4ffabc7376f66e50feabe41214891d4d30552fcf5bea76ade15d288`.
 
+Mac 0.2.1: [başarılı Actions çalışması](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34699171366), kaynak `7b507739d2627bcee411958db94b9d7a3942fb4c`. 57 TS + 30 Rust = 87 test geçti. ARM64, ad-hoc imza, DMG, boş SQLite ve gerçekten boyanmış istemci penceresi doğrulandı; son ekran görüntüsü incelendi. İlk görüntü React boyanmadan alınmıştı; smoke artık 15 saniyeye kadar gerçek içerik bekler, beyaz pencereyi başarılı saymaz. Bu gözlem PDF/etkileşimlerin Mac üzerinde uçtan uca testi değildir.
+
+Son M1 paket: `output/release/macos-m1-0.2.1/Folio_0.2.1_aarch64.dmg`, 8.372.460 bayt; SHA-256 `5535694742abc5a8d9084d138beb7c3779e29370be6ea870cb8f7369a42ee1c8`.
+
 ## 0.2.0 temel sürümünün doğrulama kaydı
 
 ## Tamamlanan kapsam
