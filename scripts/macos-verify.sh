@@ -41,9 +41,15 @@ Folio — Mac kurulumu (macOS 15 veya üzeri)
 2. Folio simgesini Applications / Uygulamalar klasörüne sürükleyin.
 3. Folio'yu Uygulamalar klasöründen açın. Node.js, Rust veya başka geliştirme aracı gerekmez.
 
-Ad-hoc deneme imzasında macOS geliştiriciyi doğrulayamadığını bildirebilir:
-İlk açma denemesinden sonra Sistem Ayarları > Gizlilik ve Güvenlik bölümündeki
-Folio için "Yine de Aç" seçeneğini kullanın. Sistem güvenliğini kapatmayın.
+macOS geliştiriciyi doğrulayamadığını bildirirse:
+1. Uygulamalar klasöründe Folio'ya çift tıklayın. Uyarı çıkınca uyarıyı kapatın.
+2. Ekranın sol üstündeki Apple () menüsünden Sistem Ayarları'nı açın.
+3. Soldan Gizlilik ve Güvenlik bölümünü seçin; aşağı kaydırın.
+4. Folio'nun engellendiği yazının yanındaki "Yine de Aç" düğmesine basın.
+5. Onay penceresinde "Aç" seçeneğini seçin.
+
+"Yine de Aç" yoksa hata mesajını ve macOS sürümünü geliştiriciye iletin.
+Genel "uygulama açılamıyor" mesajı farklı nedenlerden kaynaklanabilir.
 
 PDF/EPUB dosyalarınız ve notlarınız bilgisayarınızda saklanır.
 Hesap, internet bağlantısı veya sunucu aboneliği gerekmez.

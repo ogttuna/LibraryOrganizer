@@ -1,10 +1,19 @@
 # macOS: derleme, kurulum ve gerçek cihaz kabulü
 
-Folio için hedef **macOS 15 ve üzeri**, Apple Silicon ve Intel. 0.2.1 Apple Silicon `.app` ve DMG, [GitHub macOS çalışmasında](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34699171366) üretildi. ARM64 mimari, ad-hoc imza, DMG bütünlüğü, gerçek pencere açılışı ve SQLite başlatma kontrolleri geçti. Intel hedefi yapılandırılmıştır; bu sürümün Intel donanım kabulü yapılmadı.
+Folio için hedef **macOS 15 ve üzeri**, Apple Silicon ve Intel. 0.2.2 Apple Silicon `.app` ve DMG, [GitHub macOS çalışmasında](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34702784137) üretildi. ARM64 mimari, ad-hoc imza, DMG bütünlüğü, gerçek pencere açılışı ve SQLite başlatma kontrolleri geçti. Intel hedefi yapılandırılmıştır; bu sürümün Intel donanım kabulü yapılmadı.
 
 ## MacBook M1 üzerinde kurulum
 
-[Başarılı derlemenin](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34699171366) Artifacts bölümündeki Apple Silicon paketini indir; ZIP içindeki DMG paketini Mac'e kopyala, aç ve Folio'yu Applications / Uygulamalar klasörüne sürükle. Son kullanıcı bilgisayarında Node, Rust, Xcode veya geliştirme ortamı gerekmez. macOS 15 veya üzeri gerekir. Ad-hoc imza için ilk açılışta macOS onay isterse Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç yolunu kullan.
+[Başarılı derlemenin](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34702784137) Artifacts bölümündeki Apple Silicon paketini indir; ZIP içindeki DMG paketini Mac'e kopyala, aç ve Folio'yu Applications / Uygulamalar klasörüne sürükle. Son kullanıcı bilgisayarında Node, Rust, Xcode veya geliştirme ortamı gerekmez. macOS 15 veya üzeri gerekir.
+
+macOS geliştiriciyi doğrulayamadığı için açılışı engellerse:
+
+1. Uygulamalar klasöründe Folio'ya çift tıkla. Uyarı çıkınca uyarıyı kapat.
+2. Ekranın sol üstündeki  menüsünden **Sistem Ayarları**'nı aç.
+3. Soldan **Gizlilik ve Güvenlik** bölümünü seç; aşağı kaydır.
+4. Folio'nun engellendiğini belirten yazının yanındaki **Yine de Aç** düğmesine bas. Onay istenirse **Aç**'ı seç.
+
+Bu, Apple'ın [bilinmeyen geliştiriciden gelen uygulamayı açma](https://support.apple.com/tr-tr/guide/mac-help/mh40616/mac) akışıdır. Genel bir “uygulama açılamıyor” mesajı tek başına güvenlik engelini kanıtlamaz. Düğme yoksa tam uyarı ve macOS sürümüyle hata araştırılmalı; dosyaları veya kütüphane klasörünü silmek çözüm adımı değildir.
 
 ## Geliştirici için yerel derleme
 
@@ -53,7 +62,7 @@ Apple'ın dağıtım sertifikası için geliştirici hesabı gerekebilir; bu, uy
 
 Proje deposu: [LibraryOrganizer](https://github.com/ogttuna/LibraryOrganizer). Gerçek workflow/cihaz sonuçları `STATUS.md` içinde kaydedilir. CI kullanımı isteğe bağlıdır; hesap kotası dışında derleme ücreti oluşabileceği için yerel Mac komutları yeterli bir alternatiftir. Uygulama verileri her iki yöntemde de PC'de kalır.
 
-CI ayrıca gerçek `.app` binary'sini başlatır; ana pencerenin görünür olduğunu ve boş SQLite kütüphanesinin migration/integrity kontrolünü doğrular. Destekleniyorsa pencere görüntüsü artifact'a eklenir. Bu açılış smoke'u PDF ve kullanıcı etkileşim kabulünün yerine geçmez. CI testi yalnızca yeni geçici runner arşivinde çalışır.
+CI DMG'yi salt okunur bağlar, içindeki Folio.app'i ayrı bir geçici kurulum klasörüne kopyalar, çalıştırma iznini ve imzayı denetler, DMG'yi ayırır ve kurulan uygulamayı LaunchServices (`open`) üzerinden açar. Ana pencere ve boş SQLite kütüphanesinin migration/integrity kontrolü doğrulanır. `.github/workflows/macos-package-check.yml` aynı kontrolü önceki bir release çalışmasının DMG'siyle, uygulamayı yeniden derlemeden çalıştırır. Bu testler yalnızca yeni geçici runner arşivinde çalışır; PDF/kullanıcı etkileşimleri ve internetten indirilmiş dosyanın Gatekeeper onayı ayrı kabul adımlarıdır.
 
 ## Mac'te gerçek kullanım kabulü
 

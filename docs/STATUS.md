@@ -16,6 +16,8 @@ Mac 0.2.2: [başarılı Actions çalışması](https://github.com/ogttuna/Librar
 
 M1 paketi: `output/release/macos-m1-0.2.2/Folio_0.2.2_aarch64.dmg`, 8.374.291 bayt; SHA-256 `1326b93f6436b1c82a334f4565c0fb0faa45b6086f03ac9b36091e56816899d9`. Minimum macOS 15.0; Developer ID/notarization uygulanmadı. Derleme raporu, native pencere görüntüsü ve CI günlüğü aynı yerel çıktı klasöründedir.
 
+Aynı teslim DMG'si yeniden derlenmeden [kurulum kontrolünden geçti](https://github.com/ogttuna/LibraryOrganizer/actions/runs/34705595597): SHA-256 eşleşmesi, salt okunur bağlama, geçici kurulum klasörüne `ditto` ile kopyalama, kurulan dosyanın çalıştırma izni/imzası ve DMG ayrıldıktan sonra LaunchServices (`/usr/bin/open`) ile açılış doğrulandı. Native pencere, boş SQLite ve yüklenmesi tamamlanmış boş kütüphane ekranı incelendi. Kanıt: `output/release/macos-m1-0.2.2-installed-check/`. Bu CI kontrolü indirme karantinası eklemez veya kaldırmaz; kullanıcının Mac'indeki Gatekeeper kabulünü ya da bildirilen açılış sorununun çözüldüğünü göstermez.
+
 ## 0.2.1 — PDF sığdırma ve not düzenleme
 
 Radix portalı henüz PDF alanını oluşturmadan çalışan tek seferlik ölçüm kaldırıldı. Okuyucu gerçek alanın genişlik/yüksekliğini ve CSS iç boşluklarını ölçer; Sayfaya sığdır, Genişliğe sığdır ve yüzde seçimi sunar. Yakınlaştırma mevcut fit ölçeğinden başlar; not paneli ve pencere değişince yeniden hesaplanır. Sayfa değişiminde kaydırma sıfırlanır. Hatalı render sonrasında sayfa değiştirme, geciken sayfa yanıtı ve parola/tekrar deneme durumları düzeltildi.
