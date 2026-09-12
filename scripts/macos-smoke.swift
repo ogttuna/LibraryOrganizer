@@ -2,6 +2,35 @@ import AppKit
 import CoreGraphics
 import Foundation
 
+// LaunchServices starts the app outside the shell's process tree. Identify only
+// the executable copied from this run's DMG, including when cleaning up after a failure.
+if (CommandLine.arguments.count == 3 || CommandLine.arguments.count == 4)
+    && CommandLine.arguments[1] == "--find-process" {
+    let once = CommandLine.arguments.count == 4 && CommandLine.arguments[3] == "--once"
+    if CommandLine.arguments.count == 4 && !once { exit(2) }
+    let expected = URL(fileURLWithPath: CommandLine.arguments[2])
+        .resolvingSymlinksInPath().standardizedFileURL
+    let deadline = Date().addingTimeInterval(20)
+    repeat {
+        let matches = NSWorkspace.shared.runningApplications.filter { app in
+            guard !app.isTerminated, let executable = app.executableURL else { return false }
+            return executable.resolvingSymlinksInPath().standardizedFileURL == expected
+        }
+        if matches.count == 1 {
+            print(matches[0].processIdentifier)
+            exit(0)
+        }
+        if matches.count > 1 {
+            fputs("More than one process matched the controlled installed executable.\n", stderr)
+            exit(1)
+        }
+        if once { exit(1) }
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+    } while Date() < deadline
+    fputs("LaunchServices did not start the installed Folio executable within 20 seconds.\n", stderr)
+    exit(1)
+}
+
 // Ignore the title bar and shadow; a created white window is not a painted application.
 if CommandLine.arguments.count == 3 && CommandLine.arguments[1] == "--check-content" {
     let path = URL(fileURLWithPath: CommandLine.arguments[2])

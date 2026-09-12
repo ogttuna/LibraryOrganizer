@@ -10,12 +10,52 @@ folio_output="$folio_root/output/macos/$folio_target"
 folio_library="$HOME/Library/Application Support/com.tuna.folio/library"
 [[ ! -e "$folio_library" ]] || { echo 'Mevcut kütüphaneye smoke testi uygulanmaz.' >&2; exit 1; }
 mkdir -p "$folio_output"
-xcrun swiftc scripts/macos-smoke.swift -o "$RUNNER_TEMP/folio-window-smoke"
-"$folio_root/src-tauri/target/$folio_target/release/bundle/macos/Folio.app/Contents/MacOS/folio" > "$folio_output/native-start.log" 2>&1 &
-folio_pid=$!
-cleanup() { kill "$folio_pid" >/dev/null 2>&1 || true; wait "$folio_pid" 2>/dev/null || true; }
+if [[ -n "${FOLIO_SMOKE_DMG:-}" ]]; then
+  folio_dmg="$FOLIO_SMOKE_DMG"
+else
+  shopt -s nullglob
+  folio_dmgs=("$folio_root/src-tauri/target/$folio_target/release/bundle/dmg/"*.dmg)
+  [[ ${#folio_dmgs[@]} -eq 1 ]] || { echo 'Kurulum testi için bir adet DMG bekleniyor.' >&2; exit 1; }
+  folio_dmg="${folio_dmgs[0]}"
+fi
+[[ -f "$folio_dmg" && "$folio_dmg" == *.dmg ]] || { echo 'Kurulum testi DMG dosyası bulunamadı.' >&2; exit 1; }
+folio_work="$(mktemp -d "$RUNNER_TEMP/folio-installed-smoke.XXXXXX")"
+folio_smoke="$folio_work/folio-window-smoke"
+folio_mount="$folio_work/mounted-dmg"
+folio_installed_app="$folio_work/Applications/Folio.app"
+folio_installed_binary=''
+folio_mounted=false
+mkdir -p "$folio_mount" "$folio_work/Applications"
+xcrun swiftc scripts/macos-smoke.swift -o "$folio_smoke"
+cleanup() {
+  # LaunchServices owns the child process. Match its exact installed executable,
+  # never a bundle identifier or a process name that could select another app.
+  if [[ -n "$folio_installed_binary" ]]; then
+    local folio_owned_pid
+    folio_owned_pid="$("$folio_smoke" --find-process "$folio_installed_binary" --once 2>/dev/null)" || folio_owned_pid=''
+    if [[ -n "$folio_owned_pid" ]]; then kill "$folio_owned_pid" >/dev/null 2>&1 || true; fi
+  fi
+  if [[ "$folio_mounted" == true ]]; then
+    hdiutil detach "$folio_mount" >> "$folio_output/native-start.log" 2>&1 || true
+  fi
+}
 trap cleanup EXIT
-"$RUNNER_TEMP/folio-window-smoke" "$folio_pid" "$folio_output/native-window.json"
+# Exercise the delivered installer and a copied application, not the build tree.
+# Do not remove quarantine attributes or change any system security settings.
+hdiutil attach "$folio_dmg" -readonly -nobrowse -mountpoint "$folio_mount" > "$folio_output/native-start.log" 2>&1
+folio_mounted=true
+[[ -d "$folio_mount/Folio.app" && ! -L "$folio_mount/Folio.app" ]] || { echo 'DMG içinde Folio.app bulunamadı.' >&2; exit 1; }
+/usr/bin/ditto "$folio_mount/Folio.app" "$folio_installed_app"
+folio_executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$folio_installed_app/Contents/Info.plist")"
+case "$folio_executable" in ''|.|..|*/*) echo 'Geçersiz CFBundleExecutable.' >&2; exit 1 ;; esac
+folio_installed_binary="$folio_installed_app/Contents/MacOS/$folio_executable"
+[[ -f "$folio_installed_binary" && -x "$folio_installed_binary" && ! -L "$folio_installed_binary" ]] || { echo 'Kurulan uygulamanın çalıştırılabilir dosyası eksik veya çalıştırma izni yok.' >&2; exit 1; }
+codesign --verify --deep --strict "$folio_installed_app" >> "$folio_output/native-start.log" 2>&1
+hdiutil detach "$folio_mount" >> "$folio_output/native-start.log" 2>&1
+folio_mounted=false
+/usr/bin/open -n "$folio_installed_app" >> "$folio_output/native-start.log" 2>&1
+folio_pid="$("$folio_smoke" --find-process "$folio_installed_binary")"
+"$folio_smoke" "$folio_pid" "$folio_output/native-window.json"
 kill -0 "$folio_pid"
 python3 - "$folio_library/library.sqlite" "$folio_output/native-window.json" <<'PY'
 import json, pathlib, sqlite3, sys, time
@@ -44,7 +84,7 @@ folio_capture_started=$SECONDS
 while true; do
   kill -0 "$folio_pid"
   if screencapture -x -l "$folio_window" "$folio_output/native-window.png" &&
-    "$RUNNER_TEMP/folio-window-smoke" --check-content "$folio_output/native-window.png"; then
+    "$folio_smoke" --check-content "$folio_output/native-window.png"; then
     break
   fi
   if (( SECONDS - folio_capture_started >= 15 )); then
@@ -53,10 +93,27 @@ while true; do
   fi
   sleep 1
 done
-python3 - "$folio_output/native-window.json" <<'PY'
-import json, pathlib, sys
+python3 - "$folio_output/native-window.json" "$folio_dmg" "$folio_installed_app" "$folio_executable" <<'PY'
+import hashlib, json, pathlib, sys
 path = pathlib.Path(sys.argv[1])
+dmg = pathlib.Path(sys.argv[2])
 report = json.loads(path.read_text())
-report['clientContentPainted'] = True
+digest = hashlib.sha256()
+with dmg.open('rb') as source:
+    for chunk in iter(lambda: source.read(1024 * 1024), b''):
+        digest.update(chunk)
+installer_hash = digest.hexdigest()
+report.update({
+    'clientContentPainted': True,
+    'installedFromDmg': dmg.name,
+    'installedDmgSha256': installer_hash,
+    'installedAppPath': sys.argv[3],
+    'bundleExecutable': sys.argv[4],
+    'installedExecutablePermissionVerified': True,
+    'installedCodesignVerified': True,
+    'dmgDetachedBeforeLaunch': True,
+    'launchMethod': 'LaunchServices (/usr/bin/open -n)',
+    'gatekeeperDownloadAcceptance': 'not tested: CI installer; download quarantine was neither applied nor removed',
+})
 path.write_text(json.dumps(report, indent=2) + '\n')
 PY

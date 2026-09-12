@@ -1,0 +1,49 @@
+name: Folio installed macOS package check
+
+# Inspect the exact previously delivered DMG without rebuilding the application.
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Successful Apple Silicon release run whose DMG should be checked'
+        required: true
+        default: '34702784137'
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  installed-package:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.source_run_id }}
+          pattern: Folio-macos-apple-silicon-adhoc-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/folio-delivered-package
+      - name: Verify original archive and launch installed application
+        env:
+          FOLIO_DELIVERED_PACKAGE: ${{ runner.temp }}/folio-delivered-package
+        run: |
+          set -euo pipefail
+          cd "$FOLIO_DELIVERED_PACKAGE"
+          shasum -a 256 -c SHA256SUMS
+          shopt -s nullglob
+          folio_dmgs=("$FOLIO_DELIVERED_PACKAGE"/*.dmg)
+          [[ ${#folio_dmgs[@]} -eq 1 ]]
+          cd "$GITHUB_WORKSPACE"
+          FOLIO_SMOKE_DMG="${folio_dmgs[0]}" bash scripts/macos-smoke.sh aarch64-apple-darwin
+      - name: Store installed-package diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Folio-installed-package-check-${{ github.run_id }}
+          path: output/macos/aarch64-apple-darwin/
+          if-no-files-found: warn
+          retention-days: 14
