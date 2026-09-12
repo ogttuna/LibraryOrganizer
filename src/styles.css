@@ -247,11 +247,12 @@ svg {
   overflow: hidden;
 }
 .sidebar {
-  width: 224px;
+  width: 296px;
+  min-height: 0;
   flex-shrink: 0;
   background: #f2f3ed;
   border-right: 1px solid var(--border);
-  padding: 27px 15px 14px;
+  padding: 22px 14px 12px;
   display: flex;
   flex-direction: column;
 }
@@ -260,7 +261,8 @@ svg {
   align-items: center;
   gap: 10px;
   padding-left: 10px;
-  margin-bottom: 33px;
+  margin-bottom: 24px;
+  flex-shrink: 0;
 }
 .brand img {
   width: 31px;
@@ -277,36 +279,15 @@ svg {
 .brand-dot {
   color: #608266;
 }
-.workspace-label {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 0 9px 24px;
-  font-size: 12px;
-  font-weight: 550;
-}
-.workspace-label small {
-  display: block;
-  margin-top: 5px;
-  color: #899080;
-  font-size: 10px;
-  font-weight: 400;
-}
-.workspace-avatar {
-  width: 28px;
-  height: 28px;
-  background: #e5e8dc;
-  border: 1px solid #d9dece;
-  border-radius: 7px;
-  display: grid;
-  place-items: center;
-  color: #778068;
-  font-family: 'Lora Variable', Georgia, serif;
-}
 .main-navigation {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.main-navigation .nav-link {
+  min-height: 36px;
+  padding-block: 8px;
 }
 .nav-link {
   width: 100%;
@@ -347,21 +328,6 @@ svg {
 .nav-link.active .nav-count {
   color: #456344;
 }
-.sidebar-section-heading {
-  margin-top: 32px;
-  padding: 0 7px 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #91988a;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.25px;
-}
-.sidebar-section-heading .button {
-  width: 23px;
-  height: 23px;
-}
 .category-navigation {
   overflow-y: auto;
   min-height: 50px;
@@ -385,32 +351,20 @@ svg {
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 35px;
-  padding: 0;
+  min-height: 42px;
+  padding: 8px 0;
   border: 0;
   background: none;
   text-align: left;
   min-width: 0;
   flex: 1;
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1.45;
 }
 .category-link > span:first-of-type {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.category-edit {
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  background: transparent;
-  border: 0;
-  width: 20px;
-  height: 26px;
-}
-.category-nav-row:hover .category-edit,
-.category-edit:focus-visible {
-  opacity: 1;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .category-empty {
   display: flex;
@@ -424,29 +378,33 @@ svg {
 }
 .sidebar-bottom {
   margin-top: auto;
-  padding-top: 22px;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+.sidebar-utilities {
+  display: flex;
+  gap: 4px;
 }
 .sidebar-bottom .nav-link {
   font-size: 12px;
+  min-height: 34px;
+  padding: 7px 10px;
+}
+.sidebar-utilities .nav-link {
+  flex: 1;
 }
 .local-storage {
   display: flex;
   align-items: center;
   gap: 9px;
   border-top: 1px solid #e0e4d8;
-  padding: 20px 8px 5px;
-  margin-top: 18px;
+  padding: 10px 10px 0;
+  margin-top: 6px;
   color: #7c8772;
 }
 .local-storage > div {
   flex: 1;
   font-size: 11px;
-}
-.local-storage small {
-  display: block;
-  font-size: 10px;
-  color: #939b8b;
-  margin-top: 5px;
 }
 .local-dot {
   width: 5px;
@@ -2157,12 +2115,9 @@ tr:focus-within .row-star,
 .results-heading select,
 .reading-tabs button,
 .category-empty,
-.workspace-label small,
-.local-storage small,
 .offline-label,
 .breadcrumbs,
 .eyebrow,
-.sidebar-section-heading,
 .resource-table th,
 .inspector-toolbar > span,
 .resource-kind,
@@ -2240,7 +2195,7 @@ input::placeholder {
 
 @media (min-width: 1600px) {
   .sidebar {
-    width: 238px;
+    width: 310px;
   }
   .inspector {
     width: 395px;
@@ -2265,8 +2220,8 @@ input::placeholder {
     min-width: 330px;
   }
   .sidebar {
-    width: 205px;
-    padding-inline: 11px;
+    width: 280px;
+    padding-inline: 12px;
   }
   .resource-table .format-column {
     display: none;
@@ -2291,7 +2246,7 @@ input::placeholder {
     padding-inline: 23px;
   }
 }
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
   .inspector:not(.inspector-empty) {
     position: absolute;
     right: 0;
@@ -2319,7 +2274,7 @@ input::placeholder {
   .sidebar {
     position: fixed;
     inset: 0 auto 0 0;
-    width: 224px;
+    width: min(310px, calc(100vw - 40px));
     z-index: 35;
     transform: translateX(-100%);
     transition: transform 180ms ease;

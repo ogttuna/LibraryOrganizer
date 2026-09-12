@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useId, useRef, useState } from 'react';
+import * as Popover from '@radix-ui/react-popover';
 import {
   BookOpen,
   Library,
@@ -18,6 +19,7 @@ import {
   Search,
   ChevronDown,
   SlidersHorizontal,
+  MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Catalog, Category, LibraryView } from '@/lib/types';
@@ -45,10 +47,15 @@ export function Sidebar({
   const { query, sidebarOpen, setSidebar } = useUI();
   const [categorySearch, setCategorySearch] = useState('');
   const [tagSearch, setTagSearch] = useState('');
-  const [tagsOpen, setTagsOpen] = useState(false);
+  const [section, setSection] = useState<'categories' | 'tags'>(() =>
+    query.tagIds.length && !query.categoryIds.length ? 'tags' : 'categories',
+  );
+  const tabsId = useId();
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
   const stats = catalog?.stats;
   const categories = catalog?.categories ?? [];
+  const parents = new Set(categories.map((category) => category.parentId).filter(Boolean));
   const matchingCategories = categoryTree(categories).filter(({ category }) => {
     if (categorySearch)
       return normalize(categoryPath(categories, category.id)).includes(normalize(categorySearch));
@@ -113,13 +120,7 @@ export function Sidebar({
             <X size={18} />
           </Button>
         </div>
-        <div className="workspace-label">
-          <span className="workspace-avatar">T</span>
-          <span>
-            Kişisel kütüphanem<small>Yalnızca bu bilgisayarda</small>
-          </span>
-        </div>
-        <nav className="main-navigation">
+        <nav className="main-navigation" aria-label="Kütüphane görünümleri">
           {nav.map(({ id, label, icon: Icon, count }) => (
             <button
               key={id}
@@ -140,168 +141,277 @@ export function Sidebar({
             </button>
           ))}
         </nav>
-        <div className="taxonomy-navigation-scroll">
-          <div className="sidebar-section-heading">
-            <span>KATEGORİLER</span>
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="Kategori oluştur"
-              onClick={() => onCategory()}
-            >
-              <Plus size={16} />
-            </Button>
+        <section className="taxonomy-browser" aria-label="Kategoriler ve etiketler">
+          <div className="taxonomy-browser-toolbar">
+            <div className="taxonomy-tabs" role="tablist" aria-label="Kütüphaneyi düzenle">
+              {(['categories', 'tags'] as const).map((tab, index) => (
+                <button
+                  key={tab}
+                  ref={(element) => {
+                    tabRefs.current[index] = element;
+                  }}
+                  type="button"
+                  role="tab"
+                  id={`${tabsId}-${tab}-tab`}
+                  aria-controls={`${tabsId}-${tab}-panel`}
+                  aria-selected={section === tab}
+                  tabIndex={section === tab ? 0 : -1}
+                  onClick={() => setSection(tab)}
+                  onKeyDown={(event) => {
+                    const next =
+                      event.key === 'Home'
+                        ? 0
+                        : event.key === 'End'
+                          ? 1
+                          : event.key === 'ArrowLeft' || event.key === 'ArrowRight'
+                            ? 1 - index
+                            : null;
+                    if (next === null) return;
+                    event.preventDefault();
+                    setSection(next === 0 ? 'categories' : 'tags');
+                    tabRefs.current[next]?.focus();
+                  }}
+                >
+                  {tab === 'categories' ? 'Kategoriler' : 'Etiketler'}
+                  <span>
+                    {tab === 'categories' ? categories.length : (catalog?.tags.length ?? 0)}
+                  </span>
+                </button>
+              ))}
+            </div>
+            {section === 'categories' ? (
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label="Kategori oluştur"
+                onClick={() => onCategory()}
+              >
+                <Plus size={16} />
+              </Button>
+            ) : onTags ? (
+              <Button size="icon" variant="ghost" aria-label="Etiketleri yönet" onClick={onTags}>
+                <SlidersHorizontal size={16} />
+              </Button>
+            ) : null}
           </div>
-          {categories.length > 6 && (
+          <div
+            className="taxonomy-panel"
+            role="tabpanel"
+            id={`${tabsId}-categories-panel`}
+            aria-labelledby={`${tabsId}-categories-tab`}
+            hidden={section !== 'categories'}
+          >
             <label className="taxonomy-nav-search">
-              <Search size={13} />
+              <Search size={15} />
               <input
                 value={categorySearch}
                 onChange={(event) => setCategorySearch(event.target.value)}
                 aria-label="Kategorilerde ara"
-                placeholder="Kategori bul"
+                placeholder="Kategori ara…"
               />
+              {categorySearch && (
+                <button
+                  type="button"
+                  aria-label="Kategori aramasını temizle"
+                  onClick={() => setCategorySearch('')}
+                >
+                  <X size={14} />
+                </button>
+              )}
             </label>
-          )}
-          <nav className="category-navigation" aria-label="Kategoriler">
-            {matchingCategories.map(({ category, depth }) => (
-              <div
-                key={category.id}
-                className={cn(
-                  'category-nav-row',
-                  query.categoryIds.includes(category.id) && 'active',
-                )}
-                style={{ paddingLeft: 5 + Math.min(depth, 6) * 12 }}
-              >
-                {categories.some((child) => child.parentId === category.id) ? (
+            <nav className="category-navigation" aria-label="Kategoriler" tabIndex={0}>
+              {matchingCategories.map(({ category, depth }) => (
+                <div
+                  key={category.id}
+                  className={cn(
+                    'category-nav-row',
+                    query.categoryIds.includes(category.id) && 'active',
+                  )}
+                  style={{ paddingLeft: 8 + Math.min(depth, 4) * 12 }}
+                >
+                  {parents.has(category.id) ? (
+                    <button
+                      className="taxonomy-tree-toggle"
+                      aria-label={`${category.name} alt kategorilerini ${collapsed.has(category.id) ? 'göster' : 'gizle'}`}
+                      aria-expanded={!collapsed.has(category.id)}
+                      onClick={() => toggleCategory(category.id)}
+                    >
+                      {collapsed.has(category.id) ? (
+                        <ChevronRight size={12} />
+                      ) : (
+                        <ChevronDown size={12} />
+                      )}
+                    </button>
+                  ) : parents.size ? (
+                    <span className="taxonomy-tree-spacer" />
+                  ) : null}
                   <button
-                    className="taxonomy-tree-toggle"
-                    aria-label={`${category.name} alt kategorilerini ${collapsed.has(category.id) ? 'göster' : 'gizle'}`}
-                    aria-expanded={!collapsed.has(category.id)}
-                    onClick={() => toggleCategory(category.id)}
+                    onClick={() => navigate('all', [category.id])}
+                    className="category-link"
+                    title={categoryPath(categories, category.id)}
+                    aria-current={query.categoryIds.includes(category.id) ? 'page' : undefined}
                   >
-                    {collapsed.has(category.id) ? (
-                      <ChevronRight size={12} />
-                    ) : (
-                      <ChevronDown size={12} />
-                    )}
+                    <Folder size={15} />
+                    <span>{category.name}</span>
+                    <span className="nav-count">{category.count || ''}</span>
                   </button>
-                ) : (
-                  <span className="taxonomy-tree-spacer" />
-                )}
-                <button
-                  onClick={() => navigate('all', [category.id])}
-                  className="category-link"
-                  title={categoryPath(categories, category.id)}
-                  aria-current={query.categoryIds.includes(category.id) ? 'page' : undefined}
-                >
-                  <Folder size={15} />
-                  <span>{category.name}</span>
-                  <span className="nav-count">{category.count || ''}</span>
+                  <CategoryActions category={category} onCategory={onCategory} />
+                </div>
+              ))}
+              {!categories.length && (
+                <button className="category-empty" onClick={() => onCategory()}>
+                  <Plus size={14} />
+                  İlk kategorini oluştur
                 </button>
-                <button
-                  className="category-edit"
-                  aria-label={`${category.name} altına kategori oluştur`}
-                  onClick={() => onCategory(undefined, category.id)}
-                >
-                  <Plus size={12} />
-                </button>
-                <button
-                  className="category-edit"
-                  aria-label={`${category.name} kategorisini düzenle`}
-                  onClick={() => onCategory(category)}
-                >
-                  <Pencil size={12} />
-                </button>
-              </div>
-            ))}
-            {!categories.length && (
-              <button className="category-empty" onClick={() => onCategory()}>
-                <Plus size={14} />
-                İlk kategorini oluştur
-              </button>
-            )}
-            {!!categories.length && !matchingCategories.length && (
-              <p className="taxonomy-nav-empty">Kategori bulunamadı.</p>
-            )}
-          </nav>
-          <div className="sidebar-section-heading taxonomy-tags-heading">
-            <button
-              className="taxonomy-section-toggle"
-              aria-expanded={tagsOpen}
-              onClick={() => setTagsOpen(!tagsOpen)}
-            >
-              {tagsOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}ETİKETLER{' '}
-              <span>{catalog?.tags.length || ''}</span>
-            </button>
-            {onTags && (
-              <Button size="icon" variant="ghost" aria-label="Etiketleri yönet" onClick={onTags}>
-                <SlidersHorizontal size={15} />
-              </Button>
-            )}
+              )}
+              {!!categories.length && !matchingCategories.length && (
+                <p className="taxonomy-nav-empty">Kategori bulunamadı.</p>
+              )}
+            </nav>
           </div>
-          {tagsOpen && (
-            <>
-              <label className="taxonomy-nav-search">
-                <Search size={13} />
-                <input
-                  value={tagSearch}
-                  onChange={(event) => setTagSearch(event.target.value)}
-                  aria-label="Gezinmede etiket ara"
-                  placeholder="Etiket bul"
-                />
-              </label>
-              <nav className="taxonomy-tag-navigation" aria-label="Etiketler">
-                {matchingTags.map((tag) => (
-                  <button
-                    key={tag.id}
-                    className={cn('nav-link', query.tagIds.includes(tag.id) && 'active')}
-                    aria-current={query.tagIds.includes(tag.id) ? 'page' : undefined}
-                    title={tag.name}
-                    onClick={() => navigateTag?.(tag.id)}
-                  >
-                    <Hash size={15} />
-                    <span>{tag.name}</span>
-                    <span className="nav-count">{tag.count || ''}</span>
-                  </button>
-                ))}
-                {!matchingTags.length && (
-                  <p className="taxonomy-nav-empty">
-                    {tagSearch
-                      ? 'Etiket bulunamadı.'
-                      : 'Kaynak ayrıntılarında etiket ekleyebilirsiniz.'}
-                  </p>
-                )}
-              </nav>
-            </>
-          )}
-        </div>
-        <div className="sidebar-bottom">
-          <button
-            className={cn('nav-link', query.view === 'trash' && 'active')}
-            onClick={() => navigate('trash')}
+          <div
+            className="taxonomy-panel"
+            role="tabpanel"
+            id={`${tabsId}-tags-panel`}
+            aria-labelledby={`${tabsId}-tags-tab`}
+            hidden={section !== 'tags'}
           >
-            <Trash2 size={17} />
-            <span>Çöp</span>
-            {!!stats?.trash && <span className="nav-count">{stats.trash}</span>}
-          </button>
-          <button className="nav-link" onClick={onSettings}>
-            <Settings2 size={17} />
-            <span>Ayarlar ve yedekleme</span>
-          </button>
-          <div className="local-storage">
+            <label className="taxonomy-nav-search">
+              <Search size={15} />
+              <input
+                value={tagSearch}
+                onChange={(event) => setTagSearch(event.target.value)}
+                aria-label="Gezinmede etiket ara"
+                placeholder="Etiket ara…"
+              />
+              {tagSearch && (
+                <button
+                  type="button"
+                  aria-label="Etiket aramasını temizle"
+                  onClick={() => setTagSearch('')}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </label>
+            <nav className="taxonomy-tag-navigation" aria-label="Etiketler" tabIndex={0}>
+              {matchingTags.map((tag) => (
+                <button
+                  key={tag.id}
+                  className={cn('nav-link', query.tagIds.includes(tag.id) && 'active')}
+                  aria-current={query.tagIds.includes(tag.id) ? 'page' : undefined}
+                  title={tag.name}
+                  onClick={() => navigateTag?.(tag.id)}
+                >
+                  <Hash size={15} />
+                  <span>{tag.name}</span>
+                  <span className="nav-count">{tag.count || ''}</span>
+                </button>
+              ))}
+              {!matchingTags.length && (
+                <p className="taxonomy-nav-empty">
+                  {tagSearch
+                    ? 'Etiket bulunamadı.'
+                    : 'Kaynak ayrıntılarında etiket ekleyebilirsiniz.'}
+                </p>
+              )}
+            </nav>
+          </div>
+        </section>
+        <div className="sidebar-bottom">
+          <div className="sidebar-utilities">
+            <button
+              className={cn('nav-link', query.view === 'trash' && 'active')}
+              onClick={() => navigate('trash')}
+            >
+              <Trash2 size={17} />
+              <span>Çöp</span>
+              {!!stats?.trash && <span className="nav-count">{stats.trash}</span>}
+            </button>
+            <button className="nav-link" aria-label="Ayarlar ve yedekleme" onClick={onSettings}>
+              <Settings2 size={17} />
+              <span>Ayarlar</span>
+            </button>
+          </div>
+          <div
+            className="local-storage"
+            title={
+              isDesktop
+                ? 'Dosyaların ve notların yalnızca bu bilgisayarda saklanır.'
+                : 'Tarayıcı verisi masaüstü kütüphanesinden ayrıdır.'
+            }
+          >
             <HardDrive size={17} />
             <div>
               <span>{isDesktop ? 'Yerel kütüphane' : 'Tarayıcı önizlemesi'}</span>
-              <small>
-                {isDesktop ? 'Dosyaların bu bilgisayarda' : 'Masaüstünden ayrı, yerel veri'}
-              </small>
             </div>
             <span className="local-dot" />
           </div>
         </div>
       </aside>
     </>
+  );
+}
+
+function CategoryActions({
+  category,
+  onCategory,
+}: {
+  category: Category;
+  onCategory: (category?: Category, initialParentId?: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  // Let the category dialog own focus when an action opens it.
+  const openingDialog = useRef(false);
+  return (
+    <Popover.Root
+      open={open}
+      onOpenChange={(value) => {
+        if (value) openingDialog.current = false;
+        setOpen(value);
+      }}
+    >
+      <Popover.Trigger asChild>
+        <button
+          className="category-actions-trigger"
+          aria-label={`${category.name} kategori işlemleri`}
+        >
+          <MoreHorizontal size={16} />
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          className="popover category-actions-popover"
+          align="end"
+          sideOffset={5}
+          aria-label={`${category.name} kategori işlemleri`}
+          onCloseAutoFocus={(event) => {
+            if (openingDialog.current) event.preventDefault();
+          }}
+        >
+          <button
+            onClick={() => {
+              openingDialog.current = true;
+              setOpen(false);
+              onCategory(category);
+            }}
+          >
+            <Pencil size={15} />
+            Düzenle
+          </button>
+          <button
+            onClick={() => {
+              openingDialog.current = true;
+              setOpen(false);
+              onCategory(undefined, category.id);
+            }}
+          >
+            <Plus size={15} />
+            Alt kategori ekle
+          </button>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
 
