@@ -8,6 +8,7 @@ output/
 .DS_Store
 *.sqlite*
 *.folio
+*.zip
 coverage/
 public/pdfjs/
 *.tsbuildinfo

@@ -1,0 +1,102 @@
+.item-notes {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 300px;
+  gap: 12px;
+}
+.inspector .inspector-scroll-notes {
+  display: flex;
+  flex-direction: column;
+}
+.inspector-scroll-notes > .notes-panel,
+.inspector-scroll-notes .item-notes {
+  flex: 1;
+  min-height: 0;
+}
+.inspector-scroll-notes .item-notes textarea.item-notes-editor {
+  min-height: 100px;
+  resize: none;
+}
+.item-notes-heading,
+.item-notes-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.item-notes-heading {
+  justify-content: space-between;
+}
+.item-notes-heading > span:last-child,
+.item-notes-actions > span {
+  font-size: 11px;
+  color: #5e6958;
+}
+.item-notes-actions > span {
+  margin-right: auto;
+}
+.item-notes-actions .button {
+  font-size: 11px;
+  gap: 5px;
+  padding-inline: 7px;
+}
+.item-notes textarea.item-notes-editor {
+  flex: 1;
+  width: 100%;
+  min-height: 220px;
+  padding: 12px;
+  color: #34472e;
+  background: #fcfdf8;
+  font-size: 14px;
+  line-height: 1.85;
+  border: 1px solid #dbe3d1;
+  border-radius: 6px;
+  resize: vertical;
+}
+.item-notes textarea.item-notes-editor::placeholder {
+  color: #5e6958;
+}
+.item-notes-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #5e6958;
+}
+.item-notes-hint svg,
+.item-notes-status svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.item-notes-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  border-top: 1px solid #e8eddf;
+  padding-top: 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #5e6958;
+  overflow-wrap: anywhere;
+}
+.item-notes-error,
+.item-notes-limit {
+  color: #a14d3c;
+  font-size: 11px;
+}
+.reader-notes > .item-notes {
+  padding: 0 16px 16px;
+  min-height: 0;
+  overflow-y: auto;
+}
+.reader-notes .item-notes textarea.item-notes-editor {
+  min-height: 140px;
+  resize: none;
+}
+.reader-notes .item-notes-actions > .button:first-child:not(:last-child) {
+  width: 100%;
+  justify-content: center;
+}

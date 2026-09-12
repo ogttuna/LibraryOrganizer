@@ -332,7 +332,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
       </div>
       <div className="settings-footer">
         <span>Folio</span>
-        <span>0.2.0</span>
+        <span>0.2.1</span>
       </div>
     </Dialog>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   getDocument,
@@ -26,8 +26,17 @@ import { Button } from '@/components/ui/button';
 import { backend, isDesktop } from '@/lib/backend';
 import { createLocalRangeTransport } from './local-range-transport';
 import { PDF_RANGE_CHUNK_SIZE } from './asset-range-reader';
+import {
+  MAX_ZOOM,
+  MIN_ZOOM,
+  readerScale,
+  stepZoom,
+  ZOOM_PRESETS,
+  type ReaderZoom,
+} from './reader-zoom';
 import { positions } from '@/lib/reading-position';
-import { saves, useSaveState } from '@/lib/save-manager';
+import { useSaveState } from '@/lib/save-manager';
+import { ItemNotes } from '@/features/item-details/ItemNotes';
 import type { Attachment, Item } from '@/lib/types';
 import { errorMessage } from '@/lib/utils';
 
@@ -45,8 +54,9 @@ export default function PdfReader({
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
   const [page, setPage] = useState(positions.latest(file.id) ?? file.lastPage);
   const [pageInput, setPageInput] = useState(String(positions.latest(file.id) ?? file.lastPage));
-  const [zoom, setZoom] = useState<number | 'fit'>('fit');
-  const [width, setWidth] = useState(800);
+  const [zoom, setZoom] = useState<ReaderZoom>('fit-page');
+  const [space, setSpace] = useState({ width: 0, height: 0 });
+  const [pageSize, setPageSize] = useState({ width: 0, height: 0 });
   const [error, setError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [rendering, setRendering] = useState(true);
@@ -56,8 +66,9 @@ export default function PdfReader({
     submit: (value: string) => void;
     retry: boolean;
   } | null>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const stage = useRef<HTMLDivElement>(null);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [stage, setStage] = useState<HTMLDivElement | null>(null);
+  const effectiveScale = readerScale(zoom, space, pageSize);
   const save = useSaveState(item.id);
   const { data: currentItem } = useQuery({
     queryKey: ['item', item.id],
@@ -69,6 +80,8 @@ export default function PdfReader({
     setError('');
     setRendering(true);
     setDoc(null);
+    setPasswordRequest(null);
+    setPassword('');
     let url = '';
     let loading: ReturnType<typeof getDocument> | undefined;
     let transport: PDFDataRangeTransport | undefined;
@@ -80,6 +93,8 @@ export default function PdfReader({
       setError(errorMessage(reason));
       setRendering(false);
       setDoc(null);
+      setPasswordRequest(null);
+      setPassword('');
       abort.abort();
       transport?.abort();
       if (loading) void loading.destroy().catch(() => {});
@@ -111,12 +126,14 @@ export default function PdfReader({
           disableStream: true,
         });
         loading.onPassword = (submit: (password: string) => void, reason: number) => {
-          if (!disposed) setPasswordRequest({ submit, retry: reason === 2 });
+          if (!disposed && !failed) setPasswordRequest({ submit, retry: reason === 2 });
         };
         return loading.promise.then((pdf) => {
           if (!disposed && !failed) {
             setDoc(pdf);
-            setPage(Math.min(positions.latest(file.id) ?? file.lastPage, pdf.numPages));
+            setPage(
+              Math.max(1, Math.min(positions.latest(file.id) ?? file.lastPage, pdf.numPages)),
+            );
             setPasswordRequest(null);
           }
         });
@@ -153,18 +170,46 @@ export default function PdfReader({
     document.addEventListener('keydown', turnPage);
     return () => document.removeEventListener('keydown', turnPage);
   }, [doc]);
-  useEffect(() => {
-    const element = stage.current;
-    if (!element) return;
-    const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
-    observer.observe(element);
+  useLayoutEffect(() => {
+    if (!stage) return;
+    const measure = () => {
+      const css = getComputedStyle(stage);
+      const next = {
+        width: Math.max(
+          0,
+          Math.floor(
+            stage.clientWidth -
+              parseFloat(css.paddingLeft || '0') -
+              parseFloat(css.paddingRight || '0'),
+          ),
+        ),
+        height: Math.max(
+          0,
+          Math.floor(
+            stage.clientHeight -
+              parseFloat(css.paddingTop || '0') -
+              parseFloat(css.paddingBottom || '0'),
+          ),
+        ),
+      };
+      setSpace((previous) =>
+        previous.width === next.width && previous.height === next.height ? previous : next,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(stage);
     return () => observer.disconnect();
-  }, []);
+  }, [stage]);
   useEffect(() => {
     setPageInput(String(page));
-  }, [page]);
+    if (stage) {
+      stage.scrollTop = 0;
+      stage.scrollLeft = 0;
+    }
+  }, [page, stage]);
   useEffect(() => {
-    if (!doc || !canvas.current) return;
+    if (!doc || !canvas || space.width <= 0 || space.height <= 0) return;
     let cancelled = false;
     let render: RenderTask | undefined;
     setRendering(true);
@@ -172,9 +217,14 @@ export default function PdfReader({
     void doc
       .getPage(page)
       .then(async (pdfPage) => {
-        if (cancelled || !canvas.current) return;
+        if (cancelled) return;
         const base = pdfPage.getViewport({ scale: 1 });
-        const scale = zoom === 'fit' ? Math.max(0.1, (width - 64) / base.width) : zoom;
+        setPageSize((previous) =>
+          previous.width === base.width && previous.height === base.height
+            ? previous
+            : { width: base.width, height: base.height },
+        );
+        const scale = readerScale(zoom, space, base);
         const viewport = pdfPage.getViewport({ scale });
         // Bound allocations for unusually large paper sizes and high-DPI displays.
         const pixelRatio = Math.min(
@@ -184,7 +234,7 @@ export default function PdfReader({
           8192 / viewport.width,
           8192 / viewport.height,
         );
-        const element = canvas.current;
+        const element = canvas;
         element.width = Math.floor(viewport.width * pixelRatio);
         element.height = Math.floor(viewport.height * pixelRatio);
         element.style.width = `${viewport.width}px`;
@@ -211,7 +261,14 @@ export default function PdfReader({
       cancelled = true;
       render?.cancel();
     };
-  }, [doc, page, zoom, width, file.id]);
+  }, [doc, page, zoom, space, canvas, file.id]);
+  function selectZoom(value: ReaderZoom) {
+    setZoom(value);
+    if (stage && typeof value !== 'number') {
+      stage.scrollTop = 0;
+      stage.scrollLeft = 0;
+    }
+  }
   function goToPage() {
     const value = Number(pageInput);
     if (doc && Number.isInteger(value) && value >= 1 && value <= doc.numPages) setPage(value);
@@ -256,18 +313,40 @@ export default function PdfReader({
             size="icon"
             variant="ghost"
             aria-label="Uzaklaştır"
-            disabled={!doc}
-            onClick={() => setZoom((z) => Math.max(0.25, (z === 'fit' ? 1 : z) - 0.25))}
+            disabled={!doc || effectiveScale <= MIN_ZOOM}
+            onClick={() => setZoom((z) => stepZoom(typeof z === 'number' ? z : effectiveScale, -1))}
           >
             <Minus size={16} />
           </Button>
-          <span>{zoom === 'fit' ? 'Sığdır' : `${Math.round(zoom * 100)}%`}</span>
+          <select
+            aria-label="Yakınlaştırma ve sığdırma"
+            value={String(zoom)}
+            disabled={!doc}
+            onChange={(event) =>
+              selectZoom(
+                event.target.value === 'fit-width' || event.target.value === 'fit-page'
+                  ? event.target.value
+                  : Number(event.target.value),
+              )
+            }
+          >
+            <option value="fit-page">Sayfaya sığdır</option>
+            <option value="fit-width">Genişliğe sığdır</option>
+            {typeof zoom === 'number' && !ZOOM_PRESETS.includes(zoom) && (
+              <option value={zoom}>{Math.round(zoom * 100)}%</option>
+            )}
+            {ZOOM_PRESETS.map((value) => (
+              <option key={value} value={value}>
+                {Math.round(value * 100)}%
+              </option>
+            ))}
+          </select>
           <Button
             size="icon"
             variant="ghost"
             aria-label="Yakınlaştır"
-            disabled={!doc}
-            onClick={() => setZoom((z) => Math.min(3, (z === 'fit' ? 1 : z) + 0.25))}
+            disabled={!doc || effectiveScale >= MAX_ZOOM}
+            onClick={() => setZoom((z) => stepZoom(typeof z === 'number' ? z : effectiveScale, 1))}
           >
             <Plus size={16} />
           </Button>
@@ -275,8 +354,10 @@ export default function PdfReader({
             size="icon"
             variant="ghost"
             aria-label="Genişliğe sığdır"
+            title="Genişliğe sığdır"
+            aria-pressed={zoom === 'fit-width'}
             disabled={!doc}
-            onClick={() => setZoom('fit')}
+            onClick={() => selectZoom('fit-width')}
           >
             <Maximize size={16} />
           </Button>
@@ -304,7 +385,11 @@ export default function PdfReader({
         </div>
       </div>
       <div className="reader-body">
-        <div className="reader-stage" ref={stage}>
+        <div
+          className="reader-stage"
+          ref={setStage}
+          aria-busy={rendering && !error && !passwordRequest}
+        >
           {passwordRequest ? (
             <form
               className="pdf-password"
@@ -352,46 +437,19 @@ export default function PdfReader({
                   Sayfa hazırlanıyor…
                 </div>
               )}
-              <canvas
-                ref={canvas}
-                aria-label={`${item.title}, sayfa ${page}`}
-                role="img"
-                className={rendering ? 'canvas-loading' : ''}
-              />
             </>
           )}
+          <canvas
+            ref={setCanvas}
+            hidden={!!error || !!passwordRequest || !doc}
+            aria-label={`${item.title}, sayfa ${page}`}
+            role="img"
+            className={rendering ? 'canvas-loading' : ''}
+          />
         </div>
         {notesOpen && (
           <aside className="reader-notes">
-            <label className="detail-label" htmlFor="reader-notes">
-              Kişisel notların
-            </label>
-            <textarea
-              id="reader-notes"
-              value={notes}
-              placeholder="Okurken aklına gelenleri yaz…"
-              maxLength={1_000_000}
-              onChange={(e) => saves.queue(item.id, { notes: e.target.value })}
-            />
-            <div
-              className={`save-status ${save?.status === 'error' ? 'save-error' : ''}`}
-              role="status"
-            >
-              {save?.status === 'error'
-                ? save.error
-                : save?.status === 'pending' || save?.status === 'saving'
-                  ? 'Kaydediliyor…'
-                  : 'Değişiklikler kaydedildi'}
-            </div>
-            {save?.status === 'error' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void saves.flush(item.id).catch(() => {})}
-              >
-                Kaydetmeyi yeniden dene
-              </Button>
-            )}
+            <ItemNotes itemId={item.id} value={notes} page={doc ? page : undefined} />
           </aside>
         )}
       </div>

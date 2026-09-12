@@ -1996,9 +1996,15 @@ tr:focus-within .row-star,
   font-size: 12px;
   border-color: #e2ecd5;
 }
-.reader-zoom > span {
-  width: 40px;
-  text-align: center;
+.reader-zoom select {
+  width: 145px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--foreground);
+}
+.reader-zoom .button[aria-pressed='true'] {
+  background: #e2eadb;
+  color: #285346;
 }
 .reader-body {
   display: flex;
@@ -2009,9 +2015,14 @@ tr:focus-within .row-star,
   overflow: auto;
   flex: 1;
   min-width: 0;
+  min-height: 0;
   position: relative;
   background: #e9ede3;
   padding: 28px 32px;
+  scrollbar-gutter: stable;
+}
+.reader-stage canvas[hidden] {
+  display: none;
 }
 .reader-stage canvas {
   display: block;
@@ -2487,9 +2498,12 @@ input::placeholder {
   .reader-actions .button span {
     display: none;
   }
-  .reader-zoom > span {
-    width: 31px;
-    font-size: 10px;
+  .reader-toolbar {
+    flex-wrap: wrap;
+  }
+  .reader-zoom select {
+    width: 132px;
+    font-size: 11px;
   }
   .reader-notes {
     position: absolute;

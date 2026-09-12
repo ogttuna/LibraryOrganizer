@@ -2,7 +2,7 @@
 
 ## Hızlı kontroller
 
-`npm test`: 43 davranış kontrolü; kapatırken bekleyen yazmaları boşaltma, hata ekranından kurtarma, PDF range yanıt/boyut doğrulama ve iptal, geri yükleme onayı ve otomatik kaydetmenin birleştirilmesi, devam eden kayıtta yeni yazının korunması, başarısız kayıtta taslağın korunması, Türkçe önizleme araması ve filtre semantiği.
+`npm test`: PDF okuyucu portal/ölçüm/zoom/parola ve ortak not düzenleme dahil davranış kontrolleri; kapatırken bekleyen yazmaları boşaltma, hata ekranından kurtarma, PDF range yanıt/boyut doğrulama ve iptal, geri yükleme onayı ve otomatik kaydetmenin birleştirilmesi, devam eden kayıtta yeni yazının korunması, başarısız kayıtta taslağın korunması, Türkçe önizleme araması ve filtre semantiği.
 
 `npm run test:core`: gerçek SQLite ve geçici klasörlerle import, SHA-256 mükerrerliği, çoklu dosya, yeniden açılma, çoklu kategori ve toplu ekleme, kategori döngüsü, transaction geri alma, Türkçe FTS5, etiket AND/OR, kategori yeniden adlandırma, çöp/geri getirme, null yıl, başarısız import temizliği, başlangıç toparlaması, dosya yolu kapsamı ve yedek taşınabilirliği.
 
@@ -41,3 +41,7 @@ Bu ortamın ölçekli Wayland oturumunda WebKitWebDriver pointer/clear işlemler
 Tarayıcı önizlemesi gerçek IndexedDB ve dosya Blob'ları kullanır. Playwright ile not yazarken anında başka kaynağa geçme, tekrar geri dönme, normalize edilmiş arama, okuma filtresi, PDF dosyası ekleme ve görüntüleme kontrol edilir. Ekranlar masaüstü ve dar pencere boyutunda incelenir. Dış internet istekleri beklenmez; Vite HMR yalnızca geliştirmede yerel WebSocket kullanır.
 
 Masaüstü çapraz platform ve yüksek hacim kabul kapıları `ROADMAP.md` içinde ayrıca bulunur.
+
+## PDF sığdırma ve not regresyonu
+
+`python3 scripts/smoke-reader-fit.py --help` ayrı `output/reader-fit-smoke/` verisiyle gerçek WebKit okuyucu kontrolünü çalıştırır. Test portu varsayılan 4451; mevcut kullanıcı arşivine dokunmayı reddeder. Dikey/yatay iki sayfa, gerçek canvas/alan geometrisi, not paneli, pencere boyutu, yakınlaştırma, hızlı sayfa değişimi ve kapanışta not kalıcılığı doğrulanır. Kullanıcının açık uygulamasıyla çakışmayı önlemek için ayrı Xvfb ve DBus oturumu kullanılır.

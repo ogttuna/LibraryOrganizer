@@ -1,6 +1,20 @@
 # Uygulama ve doğrulama durumu
 
-12 Eylül 2026 · Folio 0.2.0
+12 Eylül 2026 · Folio 0.2.1
+
+## 0.2.1 — PDF sığdırma ve not düzenleme
+
+Radix portalı henüz PDF alanını oluşturmadan çalışan tek seferlik ölçüm kaldırıldı. Okuyucu gerçek alanın genişlik/yüksekliğini ve CSS iç boşluklarını ölçer; Sayfaya sığdır, Genişliğe sığdır ve yüzde seçimi sunar. Yakınlaştırma mevcut fit ölçeğinden başlar; not paneli ve pencere değişince yeniden hesaplanır. Sayfa değişiminde kaydırma sıfırlanır. Hatalı render sonrasında sayfa değiştirme, geciken sayfa yanıtı ve parola/tekrar deneme durumları düzeltildi.
+
+Kaynak ayrıntıları ve PDF okuyucu ortak not düzenleyicisini kullanır. Otomatik kayıt açıklaması, Ctrl/⌘+S / Kaydet, sözcük sayısı ve hata/yeniden deneme tutarlıdır. PDF sayfa başlığı imlece eklenirken seçili notlar silinmez. Açıklama ve özet ayrı kalır.
+
+Gerçek optimize Linux/WebKit testinde 11 akış geçti: eski genişliğe sığdır 1328 px alanın yalnızca 736 px'ini kullanıyordu; yeni sürüm 1328/1328 px kullanıyor. Sayfaya sığdır 747 px yüksekliğe taşmadan uydu. Dikey/yatay sayfa, not paneli, 1024×760 pencere, hızlı zoom/sayfa değişimi, okuyucuyu hemen kapatırken not kaydı ve yeniden açma doğrulandı. Testler ayrı Xvfb/DBus/SQLite ortamında yapıldı; kullanıcının açık uygulamasına veya arşivine dokunulmadı.
+
+57 React/TypeScript testi (8 okuyucu, 6 ortak not regresyonu dahil), üretim derlemesi ve biçim kontrolleri geçti. Not düzenleme 1440×960, 900×720 ve 390×844 önizlemelerde incelendi; klavyeyle kaydetme, kayıt değişimi ve yeniden yükleme sonrası kalıcılık geçti.
+
+Kanıt: `output/reader-fit-smoke/report.json`; tekrar: `scripts/smoke-reader-fit.py`. Bu sürüm veritabanı şemasını değiştirmez.
+
+## 0.2.0 temel sürümünün doğrulama kaydı
 
 ## Tamamlanan kapsam
 

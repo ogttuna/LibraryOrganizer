@@ -4,7 +4,7 @@ Kitap, makale ve belgeler için kişisel masaüstü kütüphanesi. **Dosyalar, n
 
 Tauri 2 · React/TypeScript · Rust/SQLx · SQLite/FTS5 · PDF.js
 
-**Sürüm: 0.2.0.** Çekirdek kütüphane, sınıflandırma, okuyucu, yedekleme/geri yükleme ve kalıcı çöp akışları uygulandı. Gerçekte çalıştırılan kontroller ve platform sınırları [STATUS.md](docs/STATUS.md) içinde tutulur.
+**Sürüm: 0.2.1.** Çekirdek kütüphane, sınıflandırma, okuyucu, yedekleme/geri yükleme ve kalıcı çöp akışları uygulandı. Gerçekte çalıştırılan kontroller ve platform sınırları [STATUS.md](docs/STATUS.md) içinde tutulur.
 
 ## MacBook M1'e kurulum
 
@@ -21,11 +21,11 @@ Hedef **macOS 15 ve üzeri**. Kişisel kullanım paketi ad-hoc imzalıdır. macO
 - Başlık, yazarlar, yıl, tür, dil; birbirinden ayrı açıklama, özet ve kişisel notlar düzenle. Notlar PDF'nin içine yazılmaz.
 - Okunmadı / Okunuyor / Okundu ve favorileri kullan; çoklu seçimle kategori, etiket ve okuma durumu uygula.
 - Başlık, yazar, açıklama, özet, not, kategori, etiket ve dosya adında Türkçe arama yap. Kategori, etiket, format, tür ve okuma filtrelerini birlikte kullan.
-- PDF'yi uygulama içinde oku, sayfa/zoom/klavye gezinmesini kullan; son sayfan ve okuyucu notların korunur. EPUB ve diğer biçimler varsayılan uygulamada açılır.
+- PDF'yi uygulama içinde oku; sayfaya/genişliğe sığdırma, yüzdeyle yakınlaştırma ve klavye gezinmesini kullan; son sayfan ve okuyucu notların korunur. EPUB ve diğer biçimler varsayılan uygulamada açılır.
 - Kaynakları çöpe taşı, geri getir veya onay vererek kalıcı sil. Özgün dosyalara dokunulmaz.
 - `.folio` yedeği oluştur; yedeği doğrulayıp içeriğini inceleyerek geri yükle. Önceki kütüphane ayrı klasörde korunur.
 
-Metinler 500 ms yazma arası sonrası kaydedilir. Başarısız kayıt taslağı korunur ve yeniden denenebilir. Normal çıkış, macOS Cmd+Q dahil, bekleyen notları, okuma konumunu ve yazma işlemlerini tamamlar. Devam eden içe aktarma veya geri yükleme sırasında çıkış bekletilir. Süreci zorla öldürmek/pil kesintisi son henüz kaydedilmemiş tuş vuruşlarını koruma garantisi vermez; tamamlanmış dosyalar ve yarım aktarım toparlaması ayrıca test edilir.
+Metinler 500 ms yazma arası sonrası kaydedilir. Not alanında Ctrl/⌘+S veya Kaydet ile hemen kayıt alabilirsin; PDF okurken mevcut sayfa başlığını imlecin olduğu yere ekleyebilirsin. Başarısız kayıt taslağı korunur ve yeniden denenebilir. Normal çıkış, macOS Cmd+Q dahil, bekleyen notları, okuma konumunu ve yazma işlemlerini tamamlar. Devam eden içe aktarma veya geri yükleme sırasında çıkış bekletilir. Süreci zorla öldürmek/pil kesintisi son henüz kaydedilmemiş tuş vuruşlarını koruma garantisi vermez; tamamlanmış dosyalar ve yarım aktarım toparlaması ayrıca test edilir.
 
 ## Günlük kullanım
 

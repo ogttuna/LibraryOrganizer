@@ -31,6 +31,7 @@ import {
 } from '@/lib/types';
 import { errorMessage, formatBytes, formatDate } from '@/lib/utils';
 import { Taxonomy } from './Taxonomy';
+import { ItemNotes } from './ItemNotes';
 
 export function Inspector({
   id,
@@ -275,7 +276,7 @@ function ItemInspector({
         ))}
       </div>
       <div
-        className="inspector-scroll"
+        className={`inspector-scroll ${tab === 'notes' ? 'inspector-scroll-notes' : ''}`}
         role="tabpanel"
         id={`panel-${tab}`}
         aria-labelledby={`tab-${tab}`}
@@ -369,22 +370,7 @@ function ItemInspector({
         )}
         {tab === 'notes' && (
           <div className="notes-panel">
-            <div className="notes-intro">
-              <span className="detail-label">Kişisel notların</span>
-              <span>{draft.notes.trim() ? draft.notes.trim().split(/\s+/).length : 0} sözcük</span>
-            </div>
-            <textarea
-              aria-label="Kişisel notlar"
-              className="notes-editor"
-              value={draft.notes}
-              placeholder="Aklında kalan bir cümle, yeni bir fikir, dönüp bakmak istediğin bir konu…"
-              maxLength={1_000_000}
-              onChange={(e) => saves.queue(item.id, { notes: e.target.value })}
-            />
-            <p className="notes-footnote">
-              <StickyNote size={13} />
-              Notların bu kaynağa aittir; dosyaya yazılmaz.
-            </p>
+            <ItemNotes itemId={item.id} value={draft.notes} showSaveStatus={false} />
           </div>
         )}
         {tab === 'files' && (
@@ -436,20 +422,24 @@ function ItemInspector({
             </p>
           </div>
         )}
-        <div className="item-dates">
-          <span>Eklenme</span>
-          <span>{formatDate(item.createdAt)}</span>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="trash-action"
-          disabled={busy}
-          onClick={() => void trash()}
-        >
-          {item.deletedAt ? <RotateCcw size={14} /> : <Trash2 size={14} />}
-          {item.deletedAt ? 'Çöpten geri getir' : 'Çöpe taşı'}
-        </Button>
+        {tab !== 'notes' && (
+          <>
+            <div className="item-dates">
+              <span>Eklenme</span>
+              <span>{formatDate(item.createdAt)}</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="trash-action"
+              disabled={busy}
+              onClick={() => void trash()}
+            >
+              {item.deletedAt ? <RotateCcw size={14} /> : <Trash2 size={14} />}
+              {item.deletedAt ? 'Çöpten geri getir' : 'Çöpe taşı'}
+            </Button>
+          </>
+        )}
       </div>
       <div className={`save-status ${save?.status === 'error' ? 'save-error' : ''}`} role="status">
         {save?.status === 'error' ? (
