@@ -56,5 +56,6 @@ fi
 export MACOSX_DEPLOYMENT_TARGET=15.0
 npm test
 cargo test --manifest-path src-tauri/Cargo.toml --no-default-features --locked
-npm run tauri -- build --ci --target "$folio_target" --bundles dmg -- --locked
+# DMG-only bundling removes the intermediate .app; retain it for signature and launch checks.
+npm run tauri -- build --ci --target "$folio_target" --bundles app,dmg -- --locked
 bash scripts/macos-verify.sh "$folio_target" "$folio_mode"

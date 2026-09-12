@@ -51,6 +51,7 @@ jobs:
         with:
           workspaces: src-tauri
           key: macos-${{ matrix.target }}
+          cache-on-failure: true
       - run: npm ci
       - name: Ad-hoc DMG build and package verification
         if: inputs.signing == 'adhoc'
