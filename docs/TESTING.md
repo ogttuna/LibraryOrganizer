@@ -2,7 +2,7 @@
 
 ## Hızlı kontroller
 
-`npm test`: 42 davranış kontrolü; kapatırken bekleyen yazmaları boşaltma, hata ekranından kurtarma, PDF range yanıt/boyut doğrulama ve iptal, geri yükleme onayı ve otomatik kaydetmenin birleştirilmesi, devam eden kayıtta yeni yazının korunması, başarısız kayıtta taslağın korunması, Türkçe önizleme araması ve filtre semantiği.
+`npm test`: 43 davranış kontrolü; kapatırken bekleyen yazmaları boşaltma, hata ekranından kurtarma, PDF range yanıt/boyut doğrulama ve iptal, geri yükleme onayı ve otomatik kaydetmenin birleştirilmesi, devam eden kayıtta yeni yazının korunması, başarısız kayıtta taslağın korunması, Türkçe önizleme araması ve filtre semantiği.
 
 `npm run test:core`: gerçek SQLite ve geçici klasörlerle import, SHA-256 mükerrerliği, çoklu dosya, yeniden açılma, çoklu kategori ve toplu ekleme, kategori döngüsü, transaction geri alma, Türkçe FTS5, etiket AND/OR, kategori yeniden adlandırma, çöp/geri getirme, null yıl, başarısız import temizliği, başlangıç toparlaması, dosya yolu kapsamı ve yedek taşınabilirliği.
 

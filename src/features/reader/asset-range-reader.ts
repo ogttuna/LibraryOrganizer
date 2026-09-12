@@ -13,7 +13,7 @@ export class AssetRangeReader {
   constructor(
     private readonly url: string,
     readonly length: number,
-    private readonly fetcher: typeof fetch = fetch,
+    private readonly fetcher: typeof fetch = (...args) => globalThis.fetch(...args),
   ) {
     const source = new URL(url);
     if (!(

@@ -19,7 +19,7 @@ Yerel ortam: Ubuntu 24.04.4, Node 24.21.0, Rust 1.95.0, GTK 3.24.41, WebKitGTK 2
 | Kontrol                              | Sonuç                                                                                                                                     |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Rust çekirdek                        | 30 test geçti; ignored olan ek test yalnızca süreç testi tarafından çağrılan alt süreç işçisidir                                          |
-| React / TypeScript davranış testleri | 42 test geçti                                                                                                                             |
+| React / TypeScript davranış testleri | 43 test geçti                                                                                                                             |
 | TypeScript/Vite üretim derlemesi     | Geçti                                                                                                                                     |
 | Masaüstü dahil Clippy                | Geçti                                                                                                                                     |
 | Linux gerçek Tauri/WebKit            | IPC, SQLite, import/mükerrerlik, Türkçe FTS, not otomatik kayıt, PDF sayfaları ve yeniden açılış geçti                                    |

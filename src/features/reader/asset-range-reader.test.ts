@@ -13,9 +13,23 @@ function reply(begin: number, end: number, total: number, overrides: Record<stri
     },
   });
 }
-afterEach(() => vi.useRealTimers());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 describe('Native PDF byte ranges', () => {
+  it('calls the default WebKit fetch with its required Window receiver', async () => {
+    const fetcher = vi.fn(function (this: unknown) {
+      if (this !== globalThis) throw new TypeError('Fetch requires its Window receiver');
+      return Promise.resolve(reply(0, 8, 100));
+    });
+    vi.stubGlobal('fetch', fetcher);
+    const reader = new AssetRangeReader(url, 100);
+    expect([...(await reader.read(0, 8))]).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+    expect(fetcher).toHaveBeenCalledOnce();
+  });
+
   it('splits a merged request below the asset protocol cap and preserves byte order', async () => {
     const length = PDF_RANGE_CHUNK_SIZE * 2 + 37;
     const fetcher = vi.fn<typeof fetch>(async (_url, options) => {

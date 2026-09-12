@@ -34,7 +34,7 @@ Başlangıç toparlanması yalnızca yarım işlere ait staging/kalıcı dosyala
 
 Frontend ek kimliği gönderir. Rust göreli yolun arşiv kökünde kaldığını canonical path ile doğrular. Asset kapsamı sadece `$APPLOCALDATA/library/files/**`. Dosya açma Rust tarafındaki opener üzerinden yapılır; frontend'e genel dosya sistemi veya shell yetkisi verilmez. İçe aktarma PDF, EPUB, TXT, MD, DOC, DOCX, ODT, RTF ve DJVU ile sınırlıdır. HTML/çalıştırılabilir dosyalar açılmaz.
 
-PDF.js bir seferde tek sayfa render eder; zoom, sayfa seçimi, genişliğe sığdırma ve son sayfa geri dönüşü sağlar. Yerel dosya URL'si kullanır; Base64 taşımaz. Range/stream davranışı platform kabul testidir. EPUB ve diğer formatlar varsayılan uygulamada açılır.
+PDF.js bir seferde tek sayfa render eder; zoom, sayfa seçimi, genişliğe sığdırma ve son sayfa geri dönüşü sağlar. Yerel dosya URL'si kullanır; Base64 taşımaz. Masaüstünde PDFDataRangeTransport adaptörü en fazla 256 KiB parçalar ve dört eşzamanlı istekle scoped asset protokolünden okur. Her yanıtın 206 durumu, Content-Range başlangıç/bitiş/toplamı ve gövde uzunluğu doğrulanır. İptal, 15 saniye zaman aşımı ve hatalı yanıt okuyucuyu takılı bırakmadan sonlandırır. WebKit'in Window alıcısı gerektiren fetch çağrısı korunur. Tarayıcı önizlemesi Blob URL yolunu kullanır. Platforma özgü PDF kabulü ayrıca yapılır. EPUB ve diğer formatlar varsayılan uygulamada açılır.
 
 ## Yedekleme tasarımı
 
